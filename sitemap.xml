@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main app -->
+  <url><loc>https://deprudentportmall.netlify.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+
+  <!-- SEO services page -->
+  <url><loc>https://deprudentportmall.netlify.app/seo.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/about.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Blog posts -->
+  <url><loc>https://deprudentportmall.netlify.app/blog-firebase-vs-shopify.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-headless-shopify-explained.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-mobile-first-design.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-no-monthly-fees-explained.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-paystack-vs-flutterwave.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-whatsapp-ordering.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-shopify-vs-headless-shopify.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/blog-first-10-sales.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Store demos -->
+  <url><loc>https://deprudentportmall.netlify.app/mall.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/restaurant.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/luxury.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/headless-shopify.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/portfolio.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Checkout / Admin (kept out of robots.txt indexing, listed here only for completeness) -->
+  <url><loc>https://deprudentportmall.netlify.app/checkout.html</loc><changefreq>never</changefreq><priority>0.1</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/store-admin.html</loc><changefreq>never</changefreq><priority>0.1</priority></url>
+</urlset>

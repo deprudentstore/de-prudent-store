@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout – De Prudent</title>
+  <style>
+    :root { --primary: #1a1a2e; --accent: #d4af37; --bg: #f5f5f5; --text: #333; --radius: 12px; --font: 'Segoe UI', system-ui, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .header { background: var(--primary); color: white; padding: 15px 20px; border-radius: var(--radius); margin-bottom: 20px; text-align: center; }
+    .section { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .section h2 { margin-bottom: 10px; color: var(--primary); }
+    .order-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .total { font-weight: 700; font-size: 1.2rem; margin-top: 10px; }
+    .bank-details { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-top: 10px; }
+    .bank-details p { margin: 5px 0; }
+    .btn {
+      display: block; width: 100%; padding: 14px; border-radius: 30px; border: none;
+      font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 12px; text-align: center;
+    }
+    .btn-card { background: var(--accent); color: var(--primary); }
+    .btn-whatsapp { background: #25D366; color: white; }
+    .btn-back { background: #888; color: white; }
+    .hidden { display: none; }
+    #payment-status { text-align: center; margin-top: 10px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Checkout</h1>
+      <p id="storeNameDisplay">Store</p>
+    </div>
+
+    <div class="section" id="orderSummary">
+      <h2>Your Order</h2>
+      <div id="orderItems"></div>
+      <div class="total">Total: <span id="orderTotal"></span></div>
+    </div>
+
+    <div class="section hidden" id="bankSection">
+      <h2>Bank Transfer</h2>
+      <p>Transfer the total amount to the account below and send us a confirmation on WhatsApp.</p>
+      <div class="bank-details" id="bankDetails"></div>
+    </div>
+
+    <div id="payment-status"></div>
+
+    <button class="btn btn-card hidden" id="paystackBtn">Pay with Card</button>
+    <button class="btn btn-whatsapp" id="whatsappConfirmBtn">Confirm Order via WhatsApp</button>
+    <button class="btn btn-back" onclick="history.back()">← Back to Store</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
+      authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
+      projectId: "deprudent-store-platform-cce59",
+      storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
+      messagingSenderId: "274718749378",
+      appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const storeSlug = urlParams.get('store') || 'mall';
+    const cart = JSON.parse(localStorage.getItem('checkoutCart') || '[]');
+
+    if (cart.length === 0) {
+      document.getElementById('orderItems').innerHTML = '<p>Your cart is empty.</p>';
+    } else {
+      let html = '', total = 0;
+      cart.forEach(item => {
+        const lineTotal = item.price * item.qty;
+        total += lineTotal;
+        html += `<div class="order-item"><span>${item.name} × ${item.qty}</span><span>€${lineTotal.toFixed(2)}</span></div>`;
+      });
+      document.getElementById('orderItems').innerHTML = html;
+      document.getElementById('orderTotal').textContent = `€${total.toFixed(2)}`;
+    }
+
+    const storeRef = doc(db, "stores", storeSlug);
+    const storeSnap = await getDoc(storeRef);
+    const storeData = storeSnap.exists() ? storeSnap.data() : {};
+    document.getElementById('storeNameDisplay').textContent = storeData.name || storeSlug;
+
+    if (storeData.bankName && storeData.accountNumber && storeData.accountName) {
+      document.getElementById('bankSection').classList.remove('hidden');
+      document.getElementById('bankDetails').innerHTML = `
+        <p><strong>Bank:</strong> ${storeData.bankName}</p>
+        <p><strong>Account Number:</strong> ${storeData.accountNumber}</p>
+        <p><strong>Account Name:</strong> ${storeData.accountName}</p>
+      `;
+    }
+
+    if (storeData.paystackPublicKey) {
+      document.getElementById('paystackBtn').classList.remove('hidden');
+      document.getElementById('paystackBtn').addEventListener('click', () => {
+        const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const handler = PaystackPop.setup({
+          key: storeData.paystackPublicKey,
+          email: "customer@example.com",
+          amount: Math.round(total * 100),
+          currency: 'NGN',
+          ref: '' + Math.floor((Math.random() * 1000000000) + 1),
+          onClose: function() {
+            document.getElementById('payment-status').textContent = 'Payment cancelled.';
+          },
+          callback: function(response) {
+            document.getElementById('payment-status').innerHTML = '<span style="color:green;">✅ Payment successful! Reference: ' + response.reference + '</span>';
+            localStorage.removeItem('checkoutCart');
+          }
+        });
+        handler.openIframe();
+      });
+    }
+
+    document.getElementById('whatsappConfirmBtn').addEventListener('click', () => {
+      if (cart.length === 0) return;
+      const summary = cart.map(i => `${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}`).join('%0A');
+      const total = cart.reduce((s,i) => s + i.price * i.qty, 0).toFixed(2);
+      window.open(`https://wa.me/2349162306809?text=Order%20from%20${storeSlug}%3A%0A${summary}%0A%0ATotal%3A%20€${total}`, '_blank');
+    });
+  </script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Store Admin – De Prudent</title>
+  <style>
+    :root { --primary: #1a1a2e; --accent: #d4af37; --bg: #f5f5f5; --card-bg: #fff; --radius: 10px; --font: 'Segoe UI', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: #333; }
+
+    .top-banner {
+      background: var(--primary); color: white;
+      padding: 12px 20px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .banner-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .banner-logo { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+    .store-switcher { padding: 7px 12px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .banner-right { display: flex; align-items: center; gap: 15px; }
+    .banner-link { color: white; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    .banner-link:hover { text-decoration: underline; }
+    .logout-btn {
+      background: #e74c3c; color: white; border: none;
+      padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 15px; margin-bottom: 25px; }
+    .dash-card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .dash-card h3 { font-size: 0.85rem; color: #888; text-transform: uppercase; }
+    .dash-card p { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    .section { background: var(--card-bg); border-radius: var(--radius); padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .section h2 { margin-bottom: 15px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { background: var(--card-bg); border: 2px solid #eee; padding: 9px 18px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .tab-btn.active { background: var(--primary); color: var(--accent); border-color: var(--primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:640px){ form{ grid-template-columns: 1fr; } }
+    form .full-width { grid-column: 1 / -1; }
+    input, textarea, button, select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; }
+    button { background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; }
+    button.danger { background: #e74c3c; }
+    button.secondary { background: #888; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 0.88rem; }
+    .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+    .hidden { display: none; }
+    #loginBox { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: var(--radius); box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
+    #loginBox input { width: 100%; margin-bottom: 12px; }
+    #loginBox select { width: 100%; margin-bottom: 12px; }
+    #statusMsg { text-align: center; padding: 10px; margin: 10px 0; border-radius: 8px; display: none; }
+    #statusMsg.success { background: #d4edda; color: #155724; display: block; }
+    #statusMsg.error { background: #f8d7da; color: #721c24; display: block; }
+    .security-note { font-size: 0.72rem; color: #aaa; margin-top: 14px; line-height: 1.5; }
+    .status-badge { padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-fulfilled { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .order-status-select { font-size: 0.8rem; padding: 5px 8px; }
+    .kern-notice { background: #fff3cd; border: 1px solid #ffe08a; border-radius: 10px; padding: 18px; color: #856404; font-size: 0.9rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div id="loginBox">
+    <h2>🔐 Store Admin Login</h2>
+    <select id="storeSelectLogin">
+      <option value="mall">🛒 Mall</option>
+      <option value="restaurant">🍽️ Abeni (Restaurant)</option>
+      <option value="luxury">🖤 MARQUE (Luxury)</option>
+      <option value="headless-shopify">⚡ Kern (Headless Shopify)</option>
+    </select>
+    <input type="password" id="passwordInput" placeholder="Enter store password">
+    <button id="loginBtn">Login</button>
+    <p id="loginError" style="color:red; margin-top:10px;"></p>
+    <p class="security-note">⚠️ Demo login only: this compares the password in the browser against a Firestore document. Do not reuse a real/sensitive password here — for production, password checks should happen in a server-side function instead.</p>
+  </div>
+
+  <div id="adminBox" class="hidden">
+    <div class="top-banner">
+      <div class="banner-left">
+        <div class="banner-logo">De Prudent Admin</div>
+        <select class="store-switcher" id="storeSwitcher">
+          <option value="mall">🛒 Mall</option>
+          <option value="restaurant">🍽️ Abeni</option>
+          <option value="luxury">🖤 MARQUE</option>
+          <option value="headless-shopify">⚡ Kern</option>
+        </select>
+      </div>
+      <div class="banner-right">
+        <a href="#" id="viewStoreLink" class="banner-link" target="_blank">🛒 View Store</a>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="dash-cards">
+        <div class="dash-card"><h3>Products</h3><p id="dashProducts">0</p></div>
+        <div class="dash-card"><h3>Orders</h3><p id="dashOrders">0</p></div>
+        <div class="dash-card"><h3>Pending</h3><p id="dashPending">0</p></div>
+        <div class="dash-card"><h3>Revenue</h3><p id="dashRevenue">0</p></div>
+      </div>
+
+      <div id="statusMsg"></div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="products">📦 Products</button>
+        <button class="tab-btn" data-tab="orders">🧾 Orders</button>
+      </div>
+
+      <!-- PRODUCTS TAB -->
+      <div class="tab-panel active" id="tab-products">
+        <div id="kernNotice" class="kern-notice hidden">
+          ⚡ Kern (Headless Shopify) pulls its catalogue live from Shopify's Storefront API, not from this Firestore product database. To manage Kern's products, use your Shopify Admin directly — this panel can't edit them.
+        </div>
+
+        <div class="section" id="productFormSection">
+          <h2 id="formTitle">Add Product</h2>
+          <form id="productForm">
+            <input type="hidden" id="editId">
+            <input type="text" id="name" placeholder="Product / Dish Name *" required>
+            <input type="text" id="price" placeholder="Price *" required>
+
+            <select id="category"></select>
+            <input type="text" id="spice" placeholder="Spice level (e.g. Mild, Medium, Hot)" class="hidden">
+
+            <input type="text" id="sku" placeholder="SKU (e.g. AC-014)" class="hidden">
+            <input type="text" id="sizes" placeholder="Sizes, comma separated (e.g. S,M,L)" class="hidden">
+            <input type="text" id="colors" placeholder="Colors, comma separated (e.g. Black,Bone)" class="hidden full-width">
+            <label class="hidden" id="soldOutLabel" style="display:flex;align-items:center;gap:8px;grid-column:1/-1;">
+              <input type="checkbox" id="soldOut" style="width:auto;"> Mark as sold out
+            </label>
+
+            <textarea id="description" placeholder="Description" class="full-width"></textarea>
+            <input type="text" id="imageUrl" placeholder="Image URL" class="full-width">
+            <div class="full-width">
+              <button type="submit" id="saveBtn">Save Product</button>
+              <button type="button" id="cancelEditBtn" class="secondary hidden">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="section" id="productListSection">
+          <h2>Products</h2>
+          <table id="productTable">
+            <thead><tr><th>Image</th><th>Name</th><th>Cat/Info</th><th>Price</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div class="tab-panel" id="tab-orders">
+        <div class="section">
+          <h2>Orders</h2>
+          <table id="ordersTable">
+            <thead><tr><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Placed</th></tr></thead>
+            <tbody><tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No orders yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
+      authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
+      projectId: "deprudent-store-platform-cce59",
+      storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
+      messagingSenderId: "274718749378",
+      appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ===== Store type definitions (each store has a different product schema) =====
+    const STORE_TYPES = {
+      'mall': {
+        label: 'Khalee Mall', fields: ['category'],
+        categories: [['trending','Trending'],['women','Women'],['men','Men'],['kids','Kids'],['electronics','Electronics'],['home','Home'],['sports','Sports'],['beauty','Beauty'],['deals','Deals'],['recommend','Recommended']]
+      },
+      'restaurant': {
+        label: 'Abeni', fields: ['category','spice'],
+        categories: [['starters','Starters & Small Chops'],['mains','Main Course'],['grills','Grills & Suya'],['desserts','Desserts'],['drinks','Drinks']]
+      },
+      'luxury': {
+        label: 'MARQUE', fields: ['sku','sizes','colors','soldOut'], categories: null
+      },
+      'headless-shopify': {
+        label: 'Kern', fields: [], categories: null, readOnly: true
+      }
+    };
+
+    let storeSlug = new URLSearchParams(window.location.search).get('store') || 'mall';
+    if (!STORE_TYPES[storeSlug]) storeSlug = 'mall';
+    let allProducts = [];
+    let allOrders = [];
+    let currentEditId = null;
+
+    document.getElementById('storeSelectLogin').value = storeSlug;
+
+    function showMsg(text, isError = false) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = text;
+      el.className = isError ? 'error' : 'success';
+      setTimeout(() => el.className = '', 3000);
+    }
+
+    function applyStoreType() {
+      const type = STORE_TYPES[storeSlug];
+      document.getElementById('pageTitle').textContent = `${type.label} – Store Admin`;
+      document.getElementById('viewStoreLink').href = `${storeSlug}.html`;
+      document.getElementById('storeSwitcher').value = storeSlug;
+
+      const kernNotice = document.getElementById('kernNotice');
+      const formSection = document.getElementById('productFormSection');
+      const listSection = document.getElementById('productListSection');
+      if (type.readOnly) {
+        kernNotice.classList.remove('hidden');
+        formSection.classList.add('hidden');
+        listSection.classList.add('hidden');
+      } else {
+        kernNotice.classList.add('hidden');
+        formSection.classList.remove('hidden');
+        listSection.classList.remove('hidden');
+      }
+
+      // Show/hide fields based on this store's schema
+      const categorySelect = document.getElementById('category');
+      const spiceInput = document.getElementById('spice');
+      const skuInput = document.getElementById('sku');
+      const sizesInput = document.getElementById('sizes');
+      const colorsInput = document.getElementById('colors');
+      const soldOutLabel = document.getElementById('soldOutLabel');
+
+      const has = (f) => type.fields.includes(f);
+      categorySelect.classList.toggle('hidden', !has('category'));
+      spiceInput.classList.toggle('hidden', !has('spice'));
+      skuInput.classList.toggle('hidden', !has('sku'));
+      sizesInput.classList.toggle('hidden', !has('sizes'));
+      colorsInput.classList.toggle('hidden', !has('colors'));
+      soldOutLabel.classList.toggle('hidden', !has('soldOut'));
+
+      if (type.categories) {
+        categorySelect.innerHTML = type.categories.map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+      }
+    }
+
+    async function loadAll() {
+      const type = STORE_TYPES[storeSlug];
+      if (type.readOnly) {
+        document.getElementById('dashProducts').textContent = '—';
+        loadOrders();
+        return;
+      }
+      try {
+        const q = query(collection(db, "products"), where("storeId", "==", storeSlug));
+        const snap = await getDocs(q);
+        allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        document.getElementById('dashProducts').textContent = allProducts.length;
+        renderProducts();
+      } catch (err) {
+        showMsg('Error loading products: ' + err.message, true);
+      }
+      loadOrders();
+    }
+
+    async function loadOrders() {
+      try {
+        const q = query(collection(db, "orders"), where("storeId", "==", storeSlug));
+        const snap = await getDocs(q);
+        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderOrders();
+        renderOrderStats();
+      } catch (err) {
+        // Orders collection may not exist yet for this store — that's fine, show empty state.
+        allOrders = [];
+        renderOrders();
+        renderOrderStats();
+      }
+    }
+
+    function renderOrderStats() {
+      document.getElementById('dashOrders').textContent = allOrders.length;
+      const pending = allOrders.filter(o => (o.status || 'pending') === 'pending').length;
+      document.getElementById('dashPending').textContent = pending;
+      const revenue = allOrders
+        .filter(o => (o.status || 'pending') !== 'cancelled')
+        .reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+      const currencySymbol = storeSlug === 'restaurant' ? '₦' : (storeSlug === 'luxury' ? '$' : '€');
+      document.getElementById('dashRevenue').textContent = currencySymbol + revenue.toLocaleString();
+    }
+
+    function renderOrders() {
+      const tbody = document.querySelector('#ordersTable tbody');
+      if (!allOrders.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No orders yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = allOrders.map(o => {
+        const customerName = o.customer?.name || o.customerName || 'Guest';
+        const itemsSummary = Array.isArray(o.items) ? o.items.map(i => `${i.name} x${i.qty}`).join(', ') : '—';
+        const status = o.status || 'pending';
+        const placedDate = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+        return `
+          <tr>
+            <td><strong>${customerName}</strong>${o.customer?.phone ? `<br><small>${o.customer.phone}</small>` : ''}</td>
+            <td style="max-width:220px;">${itemsSummary}</td>
+            <td>${Number(o.total || 0).toLocaleString()}</td>
+            <td>
+              <select class="order-status-select" data-id="${o.id}">
+                <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
+                <option value="fulfilled" ${status==='fulfilled'?'selected':''}>Fulfilled</option>
+                <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
+              </select>
+            </td>
+            <td>${placedDate}</td>
+          </tr>`;
+      }).join('');
+
+      document.querySelectorAll('.order-status-select').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          try {
+            await updateDoc(doc(db, "orders", sel.dataset.id), { status: sel.value });
+            showMsg('✅ Order status updated!');
+            loadOrders();
+          } catch (err) {
+            showMsg('❌ ' + err.message, true);
+          }
+        });
+      });
+    }
+
+    function renderProducts() {
+      const type = STORE_TYPES[storeSlug];
+      const tbody = document.querySelector('#productTable tbody');
+      tbody.innerHTML = allProducts.map(p => {
+        let infoCol = p.category || '';
+        if (type.fields.includes('spice') && p.spice) infoCol += ` · 🌶️${p.spice}`;
+        if (type.fields.includes('sku')) infoCol = p.sku || '';
+        if (type.fields.includes('soldOut') && p.soldOut) infoCol += ' · SOLD OUT';
+        return `
+        <tr>
+          <td>${p.image_url || p.img ? `<img src="${p.image_url || p.img}" class="product-img">` : '📦'}</td>
+          <td><strong>${p.name}</strong><br><small>${p.description || p.desc || ''}</small></td>
+          <td>${infoCol}</td>
+          <td>${p.price}</td>
+          <td>
+            <button class="edit-btn" data-id="${p.id}">Edit</button>
+            <button class="danger delete-btn" data-id="${p.id}">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => editProduct(btn.dataset.id)));
+      document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => deleteProduct(btn.dataset.id)));
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = STORE_TYPES[storeSlug];
+      try {
+        const payload = {
+          storeId: storeSlug,
+          name: document.getElementById('name').value.trim(),
+          price: document.getElementById('price').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          image_url: document.getElementById('imageUrl').value.trim()
+        };
+        if (type.fields.includes('category')) payload.category = document.getElementById('category').value;
+        if (type.fields.includes('spice')) payload.spice = document.getElementById('spice').value.trim() || null;
+        if (type.fields.includes('sku')) payload.sku = document.getElementById('sku').value.trim();
+        if (type.fields.includes('sizes')) payload.sizes = document.getElementById('sizes').value.split(',').map(s => s.trim()).filter(Boolean);
+        if (type.fields.includes('colors')) {
+          payload.colors = document.getElementById('colors').value.split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name, hex: '#CCCCCC' }));
+        }
+        if (type.fields.includes('soldOut')) payload.soldOut = document.getElementById('soldOut').checked;
+
+        if (currentEditId) {
+          await updateDoc(doc(db, "products", currentEditId), payload);
+          showMsg('✅ Product updated!');
+        } else {
+          await addDoc(collection(db, "products"), { ...payload, created_at: serverTimestamp() });
+          showMsg('✅ Product saved!');
+        }
+        resetForm();
+        loadAll();
+      } catch (err) {
+        showMsg('❌ ' + err.message, true);
+      }
+    });
+
+    function editProduct(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+      document.getElementById('editId').value = product.id;
+      document.getElementById('name').value = product.name || '';
+      document.getElementById('price').value = product.price || '';
+      document.getElementById('description').value = product.description || product.desc || '';
+      document.getElementById('imageUrl').value = product.image_url || product.img || '';
+      document.getElementById('category').value = product.category || '';
+      document.getElementById('spice').value = product.spice || '';
+      document.getElementById('sku').value = product.sku || '';
+      document.getElementById('sizes').value = Array.isArray(product.sizes) ? product.sizes.join(',') : '';
+      document.getElementById('colors').value = Array.isArray(product.colors) ? product.colors.map(c => c.name).join(',') : '';
+      document.getElementById('soldOut').checked = !!product.soldOut;
+      document.getElementById('formTitle').textContent = 'Edit Product';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+      document.getElementById('saveBtn').textContent = 'Update Product';
+      currentEditId = id;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      document.getElementById('productForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('formTitle').textContent = 'Add Product';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+      document.getElementById('saveBtn').textContent = 'Save Product';
+      currentEditId = null;
+    }
+    document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
+
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product?')) return;
+      try {
+        await deleteDoc(doc(db, "products", id));
+        showMsg('🗑️ Deleted!');
+        loadAll();
+      } catch (err) {
+        showMsg('❌ ' + err.message, true);
+      }
+    }
+
+    // ---- Tabs ----
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ---- Store switcher (re-prompts login since each store has its own password) ----
+    document.getElementById('storeSwitcher').addEventListener('change', (e) => {
+      const newSlug = e.target.value;
+      window.location.href = `store-admin.html?store=${newSlug}`;
+    });
+
+    // ---- DYNAMIC LOGIN (reads password from Firestore) ----
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const selectedStore = document.getElementById('storeSelectLogin').value;
+      const enteredPassword = document.getElementById('passwordInput').value;
+      if (!enteredPassword) {
+        document.getElementById('loginError').textContent = 'Please enter a password';
+        return;
+      }
+      try {
+        const storeRef = doc(db, "stores", selectedStore);
+        const storeSnap = await getDoc(storeRef);
+
+        if (!storeSnap.exists()) {
+          document.getElementById('loginError').textContent = `No password set up yet for "${selectedStore}" — add a "stores/${selectedStore}" document in Firestore with a password field.`;
+          return;
+        }
+        if (storeSnap.data().password === enteredPassword) {
+          storeSlug = selectedStore;
+          document.getElementById('loginBox').classList.add('hidden');
+          document.getElementById('adminBox').classList.remove('hidden');
+          applyStoreType();
+          loadAll();
+        } else {
+          document.getElementById('loginError').textContent = 'Wrong password';
+        }
+      } catch (err) {
+        document.getElementById('loginError').textContent = 'Error checking password';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      document.getElementById('adminBox').classList.add('hidden');
+      document.getElementById('loginBox').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
