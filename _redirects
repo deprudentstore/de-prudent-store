@@ -21,5 +21,8 @@
 # About page
 /about                               /about.html                             200
 
+# Projects page
+/projects                            /projects.html                          200
+
 # SPA catch-all — MUST BE LAST
 /*                                  /index.html                             200
