@@ -1,496 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pageTitle">Store Admin – De Prudent</title>
-  <style>
-    :root { --primary: #1a1a2e; --accent: #d4af37; --bg: #f5f5f5; --card-bg: #fff; --radius: 10px; --font: 'Segoe UI', sans-serif; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font); background: var(--bg); color: #333; }
-
-    .top-banner {
-      background: var(--primary); color: white;
-      padding: 12px 20px;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .banner-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-    .banner-logo { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
-    .store-switcher { padding: 7px 12px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
-    .banner-right { display: flex; align-items: center; gap: 15px; }
-    .banner-link { color: white; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
-    .banner-link:hover { text-decoration: underline; }
-    .logout-btn {
-      background: #e74c3c; color: white; border: none;
-      padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600;
-    }
-
-    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-    .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 15px; margin-bottom: 25px; }
-    .dash-card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .dash-card h3 { font-size: 0.85rem; color: #888; text-transform: uppercase; }
-    .dash-card p { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
-    .section { background: var(--card-bg); border-radius: var(--radius); padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .section h2 { margin-bottom: 15px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-btn { background: var(--card-bg); border: 2px solid #eee; padding: 9px 18px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-    .tab-btn.active { background: var(--primary); color: var(--accent); border-color: var(--primary); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media(max-width:640px){ form{ grid-template-columns: 1fr; } }
-    form .full-width { grid-column: 1 / -1; }
-    input, textarea, button, select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; }
-    button { background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; }
-    button.danger { background: #e74c3c; }
-    button.secondary { background: #888; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; font-size: 0.88rem; }
-    .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-    .hidden { display: none; }
-    #loginBox { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: var(--radius); box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
-    #loginBox input { width: 100%; margin-bottom: 12px; }
-    #loginBox select { width: 100%; margin-bottom: 12px; }
-    #statusMsg { text-align: center; padding: 10px; margin: 10px 0; border-radius: 8px; display: none; }
-    #statusMsg.success { background: #d4edda; color: #155724; display: block; }
-    #statusMsg.error { background: #f8d7da; color: #721c24; display: block; }
-    .security-note { font-size: 0.72rem; color: #aaa; margin-top: 14px; line-height: 1.5; }
-    .status-badge { padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-fulfilled { background: #d4edda; color: #155724; }
-    .status-cancelled { background: #f8d7da; color: #721c24; }
-    .order-status-select { font-size: 0.8rem; padding: 5px 8px; }
-    .kern-notice { background: #fff3cd; border: 1px solid #ffe08a; border-radius: 10px; padding: 18px; color: #856404; font-size: 0.9rem; line-height: 1.6; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Store Admin – De Prudent</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: 'Outfit', sans-serif; }
+  .font-display { font-family: 'Cormorant Garamond', serif; }
+  .font-mono-data { font-family: 'IBM Plex Mono', monospace; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 4px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-in { animation: fadeIn .25s ease both; }
+</style>
 </head>
-<body>
-  <div id="loginBox">
-    <h2>🔐 Store Admin Login</h2>
-    <select id="storeSelectLogin">
-      <option value="mall">🛒 Mall</option>
-      <option value="restaurant">🍽️ Abeni (Restaurant)</option>
-      <option value="luxury">🖤 MARQUE (Luxury)</option>
-      <option value="headless-shopify">⚡ Kern (Headless Shopify)</option>
-    </select>
-    <input type="password" id="passwordInput" placeholder="Enter store password">
-    <button id="loginBtn">Login</button>
-    <p id="loginError" style="color:red; margin-top:10px;"></p>
-    <p class="security-note">⚠️ Demo login only: this compares the password in the browser against a Firestore document. Do not reuse a real/sensitive password here — for production, password checks should happen in a server-side function instead.</p>
-  </div>
+<body class="bg-[#F6F4EF] text-[#1C1C24]">
+<div id="root"></div>
 
-  <div id="adminBox" class="hidden">
-    <div class="top-banner">
-      <div class="banner-left">
-        <div class="banner-logo">De Prudent Admin</div>
-        <select class="store-switcher" id="storeSwitcher">
-          <option value="mall">🛒 Mall</option>
-          <option value="restaurant">🍽️ Abeni</option>
-          <option value="luxury">🖤 MARQUE</option>
-          <option value="headless-shopify">⚡ Kern</option>
-        </select>
-      </div>
-      <div class="banner-right">
-        <a href="#" id="viewStoreLink" class="banner-link" target="_blank">🛒 View Store</a>
-        <button class="logout-btn" id="logoutBtn">Logout</button>
-      </div>
+<!-- Firebase bridge: loaded as a module, exposes db + functions on window for the React app to use -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import {
+    getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
+    authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
+    projectId: "deprudent-store-platform-cce59",
+    storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
+    messagingSenderId: "274718749378",
+    appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.__firebase = {
+    db, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, serverTimestamp
+  };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+// ===== Store type definitions — each store has its own schema, brand color, and currency =====
+const STORE_TYPES = {
+  'mall': {
+    label: 'Khalee Mall', emoji: '🛒', accent: '#C9973A', accentSoft: '#F6ECD9', currency: '€',
+    fields: ['category'],
+    categories: [['trending','Trending'],['women','Women'],['men','Men'],['kids','Kids'],['electronics','Electronics'],['home','Home'],['sports','Sports'],['beauty','Beauty'],['deals','Deals'],['recommend','Recommended']]
+  },
+  'restaurant': {
+    label: 'Abeni', emoji: '🍽️', accent: '#B5651D', accentSoft: '#F3E2D2', currency: '₦',
+    fields: ['category','spice'],
+    categories: [['starters','Starters & Small Chops'],['mains','Main Course'],['grills','Grills & Suya'],['desserts','Desserts'],['drinks','Drinks']]
+  },
+  'luxury': {
+    label: 'MARQUE', emoji: '🖤', accent: '#7C2333', accentSoft: '#F0DDE1', currency: '$',
+    fields: ['sku','sizes','colors','soldOut'], categories: null
+  },
+  'headless-shopify': {
+    label: 'Kern', emoji: '⚡', accent: '#0F9B8E', accentSoft: '#D9F3F0', currency: '$',
+    fields: [], categories: null, readOnly: true
+  }
+};
+const STORE_ORDER = ['mall', 'restaurant', 'luxury', 'headless-shopify'];
+
+function getStoreFromUrl() {
+  const slug = new URLSearchParams(window.location.search).get('store');
+  return STORE_TYPES[slug] ? slug : 'mall';
+}
+
+// ===== Small building blocks =====
+function StatCard({ label, value, accent }) {
+  return (
+    <div className="bg-white rounded-2xl border border-black/5 p-5 shadow-sm">
+      <p className="text-[11px] uppercase tracking-wider text-black/40 font-medium mb-1">{label}</p>
+      <p className="text-2xl font-display font-bold" style={{ color: accent }}>{value}</p>
     </div>
+  );
+}
 
-    <div class="container">
-      <div class="dash-cards">
-        <div class="dash-card"><h3>Products</h3><p id="dashProducts">0</p></div>
-        <div class="dash-card"><h3>Orders</h3><p id="dashOrders">0</p></div>
-        <div class="dash-card"><h3>Pending</h3><p id="dashPending">0</p></div>
-        <div class="dash-card"><h3>Revenue</h3><p id="dashRevenue">0</p></div>
-      </div>
+// ===== Login screen =====
+function LoginScreen({ onLogin }) {
+  const [selectedStore, setSelectedStore] = useState(getStoreFromUrl());
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-      <div id="statusMsg"></div>
-
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="products">📦 Products</button>
-        <button class="tab-btn" data-tab="orders">🧾 Orders</button>
-      </div>
-
-      <!-- PRODUCTS TAB -->
-      <div class="tab-panel active" id="tab-products">
-        <div id="kernNotice" class="kern-notice hidden">
-          ⚡ Kern (Headless Shopify) pulls its catalogue live from Shopify's Storefront API, not from this Firestore product database. To manage Kern's products, use your Shopify Admin directly — this panel can't edit them.
-        </div>
-
-        <div class="section" id="productFormSection">
-          <h2 id="formTitle">Add Product</h2>
-          <form id="productForm">
-            <input type="hidden" id="editId">
-            <input type="text" id="name" placeholder="Product / Dish Name *" required>
-            <input type="text" id="price" placeholder="Price *" required>
-
-            <select id="category"></select>
-            <input type="text" id="spice" placeholder="Spice level (e.g. Mild, Medium, Hot)" class="hidden">
-
-            <input type="text" id="sku" placeholder="SKU (e.g. AC-014)" class="hidden">
-            <input type="text" id="sizes" placeholder="Sizes, comma separated (e.g. S,M,L)" class="hidden">
-            <input type="text" id="colors" placeholder="Colors, comma separated (e.g. Black,Bone)" class="hidden full-width">
-            <label class="hidden" id="soldOutLabel" style="display:flex;align-items:center;gap:8px;grid-column:1/-1;">
-              <input type="checkbox" id="soldOut" style="width:auto;"> Mark as sold out
-            </label>
-
-            <textarea id="description" placeholder="Description" class="full-width"></textarea>
-            <input type="text" id="imageUrl" placeholder="Image URL" class="full-width">
-            <div class="full-width">
-              <button type="submit" id="saveBtn">Save Product</button>
-              <button type="button" id="cancelEditBtn" class="secondary hidden">Cancel</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="section" id="productListSection">
-          <h2>Products</h2>
-          <table id="productTable">
-            <thead><tr><th>Image</th><th>Name</th><th>Cat/Info</th><th>Price</th><th>Actions</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ORDERS TAB -->
-      <div class="tab-panel" id="tab-orders">
-        <div class="section">
-          <h2>Orders</h2>
-          <table id="ordersTable">
-            <thead><tr><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Placed</th></tr></thead>
-            <tbody><tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No orders yet.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-      authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-      projectId: "deprudent-store-platform-cce59",
-      storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-      messagingSenderId: "274718749378",
-      appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // ===== Store type definitions (each store has a different product schema) =====
-    const STORE_TYPES = {
-      'mall': {
-        label: 'Khalee Mall', fields: ['category'],
-        categories: [['trending','Trending'],['women','Women'],['men','Men'],['kids','Kids'],['electronics','Electronics'],['home','Home'],['sports','Sports'],['beauty','Beauty'],['deals','Deals'],['recommend','Recommended']]
-      },
-      'restaurant': {
-        label: 'Abeni', fields: ['category','spice'],
-        categories: [['starters','Starters & Small Chops'],['mains','Main Course'],['grills','Grills & Suya'],['desserts','Desserts'],['drinks','Drinks']]
-      },
-      'luxury': {
-        label: 'MARQUE', fields: ['sku','sizes','colors','soldOut'], categories: null
-      },
-      'headless-shopify': {
-        label: 'Kern', fields: [], categories: null, readOnly: true
-      }
-    };
-
-    let storeSlug = new URLSearchParams(window.location.search).get('store') || 'mall';
-    if (!STORE_TYPES[storeSlug]) storeSlug = 'mall';
-    let allProducts = [];
-    let allOrders = [];
-    let currentEditId = null;
-
-    document.getElementById('storeSelectLogin').value = storeSlug;
-
-    function showMsg(text, isError = false) {
-      const el = document.getElementById('statusMsg');
-      el.textContent = text;
-      el.className = isError ? 'error' : 'success';
-      setTimeout(() => el.className = '', 3000);
-    }
-
-    function applyStoreType() {
-      const type = STORE_TYPES[storeSlug];
-      document.getElementById('pageTitle').textContent = `${type.label} – Store Admin`;
-      document.getElementById('viewStoreLink').href = `${storeSlug}.html`;
-      document.getElementById('storeSwitcher').value = storeSlug;
-
-      const kernNotice = document.getElementById('kernNotice');
-      const formSection = document.getElementById('productFormSection');
-      const listSection = document.getElementById('productListSection');
-      if (type.readOnly) {
-        kernNotice.classList.remove('hidden');
-        formSection.classList.add('hidden');
-        listSection.classList.add('hidden');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!password) { setError('Please enter a password'); return; }
+    if (!window.__firebase) { setError('Still connecting — try again in a moment.'); return; }
+    setLoading(true);
+    try {
+      const { db, doc, getDoc } = window.__firebase;
+      const snap = await getDoc(doc(db, "stores", selectedStore));
+      if (!snap.exists()) {
+        setError(`No password set up yet for "${selectedStore}" — add a "stores/${selectedStore}" document in Firestore with a password field.`);
+      } else if (snap.data().password === password) {
+        onLogin(selectedStore);
       } else {
-        kernNotice.classList.add('hidden');
-        formSection.classList.remove('hidden');
-        listSection.classList.remove('hidden');
+        setError('Wrong password');
       }
-
-      // Show/hide fields based on this store's schema
-      const categorySelect = document.getElementById('category');
-      const spiceInput = document.getElementById('spice');
-      const skuInput = document.getElementById('sku');
-      const sizesInput = document.getElementById('sizes');
-      const colorsInput = document.getElementById('colors');
-      const soldOutLabel = document.getElementById('soldOutLabel');
-
-      const has = (f) => type.fields.includes(f);
-      categorySelect.classList.toggle('hidden', !has('category'));
-      spiceInput.classList.toggle('hidden', !has('spice'));
-      skuInput.classList.toggle('hidden', !has('sku'));
-      sizesInput.classList.toggle('hidden', !has('sizes'));
-      colorsInput.classList.toggle('hidden', !has('colors'));
-      soldOutLabel.classList.toggle('hidden', !has('soldOut'));
-
-      if (type.categories) {
-        categorySelect.innerHTML = type.categories.map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
-      }
+    } catch (err) {
+      setError('Error checking password: ' + err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    async function loadAll() {
-      const type = STORE_TYPES[storeSlug];
-      if (type.readOnly) {
-        document.getElementById('dashProducts').textContent = '—';
-        loadOrders();
-        return;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#14151F] px-4">
+      <div className="w-full max-w-sm bg-white rounded-3xl p-8 shadow-2xl animate-fade-in">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-black/40 mb-1">De Prudent</p>
+        <h1 className="font-display text-2xl font-bold mb-6">Store Admin Login</h1>
+
+        <form onSubmit={handleLogin} className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            {STORE_ORDER.map(slug => {
+              const t = STORE_TYPES[slug];
+              const active = selectedStore === slug;
+              return (
+                <button
+                  type="button" key={slug}
+                  onClick={() => setSelectedStore(slug)}
+                  className="text-left rounded-xl border-2 px-3 py-2.5 transition-all"
+                  style={{
+                    borderColor: active ? t.accent : '#EAE7E0',
+                    background: active ? t.accentSoft : '#FAFAF8'
+                  }}
+                >
+                  <div className="text-lg leading-none mb-1">{t.emoji}</div>
+                  <div className="text-xs font-semibold" style={{ color: active ? t.accent : '#555' }}>{t.label}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <input
+            type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+            placeholder="Store password"
+            className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-black/30"
+          />
+
+          {error && <p className="text-rose-600 text-xs leading-relaxed">{error}</p>}
+
+          <button
+            type="submit" disabled={loading}
+            className="w-full rounded-xl py-3 font-semibold text-sm text-white transition-opacity disabled:opacity-60"
+            style={{ background: STORE_TYPES[selectedStore].accent }}
+          >
+            {loading ? 'Checking…' : 'Login'}
+          </button>
+        </form>
+
+        <p className="text-[11px] text-black/35 leading-relaxed mt-5">
+          ⚠️ Demo login only — this compares the password in the browser against a Firestore document.
+          For a production admin panel, password checks should happen in a server-side function instead.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ===== Product form (schema-aware per store) =====
+function ProductForm({ storeSlug, editingProduct, onSaved, onCancelEdit }) {
+  const type = STORE_TYPES[storeSlug];
+  const blank = { name: '', price: '', description: '', image_url: '', category: type.categories ? type.categories[0][0] : '', spice: '', sku: '', sizes: '', colors: '', soldOut: false };
+  const [form, setForm] = useState(blank);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (editingProduct) {
+      setForm({
+        name: editingProduct.name || '',
+        price: editingProduct.price || '',
+        description: editingProduct.description || editingProduct.desc || '',
+        image_url: editingProduct.image_url || editingProduct.img || '',
+        category: editingProduct.category || (type.categories ? type.categories[0][0] : ''),
+        spice: editingProduct.spice || '',
+        sku: editingProduct.sku || '',
+        sizes: Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join(',') : '',
+        colors: Array.isArray(editingProduct.colors) ? editingProduct.colors.map(c => c.name).join(',') : '',
+        soldOut: !!editingProduct.soldOut,
+      });
+    } else {
+      setForm(blank);
+    }
+  }, [editingProduct, storeSlug]);
+
+  const has = (f) => type.fields.includes(f);
+  const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const { db, collection, addDoc, updateDoc, doc, serverTimestamp } = window.__firebase;
+      const payload = {
+        storeId: storeSlug,
+        name: form.name.trim(),
+        price: form.price.trim(),
+        description: form.description.trim(),
+        image_url: form.image_url.trim(),
+      };
+      if (has('category')) payload.category = form.category;
+      if (has('spice')) payload.spice = form.spice.trim() || null;
+      if (has('sku')) payload.sku = form.sku.trim();
+      if (has('sizes')) payload.sizes = form.sizes.split(',').map(s => s.trim()).filter(Boolean);
+      if (has('colors')) payload.colors = form.colors.split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name, hex: '#CCCCCC' }));
+      if (has('soldOut')) payload.soldOut = form.soldOut;
+
+      if (editingProduct) {
+        await updateDoc(doc(db, "products", editingProduct.id), payload);
+      } else {
+        await addDoc(collection(db, "products"), { ...payload, created_at: serverTimestamp() });
       }
+      onSaved();
+      setForm(blank);
+    } catch (err) {
+      alert('Error saving product: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputCls = "border border-black/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-black/30 w-full";
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-black/5 p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-display text-xl font-bold">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
+        {editingProduct && (
+          <button type="button" onClick={onCancelEdit} className="text-xs text-black/40 hover:text-black/70 underline">Cancel edit</button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <input className={inputCls} placeholder="Product / Dish Name *" value={form.name} onChange={e => set('name', e.target.value)} required />
+        <input className={inputCls} placeholder={`Price * (${type.currency})`} value={form.price} onChange={e => set('price', e.target.value)} required />
+
+        {has('category') && (
+          <select className={inputCls} value={form.category} onChange={e => set('category', e.target.value)}>
+            {type.categories.map(([val, label]) => <option key={val} value={val}>{label}</option>)}
+          </select>
+        )}
+        {has('spice') && <input className={inputCls} placeholder="Spice level (Mild, Medium, Hot)" value={form.spice} onChange={e => set('spice', e.target.value)} />}
+        {has('sku') && <input className={inputCls} placeholder="SKU (e.g. AC-014)" value={form.sku} onChange={e => set('sku', e.target.value)} />}
+        {has('sizes') && <input className={inputCls} placeholder="Sizes, comma separated (S,M,L)" value={form.sizes} onChange={e => set('sizes', e.target.value)} />}
+        {has('colors') && <input className={inputCls + " sm:col-span-2"} placeholder="Colors, comma separated (Black,Bone)" value={form.colors} onChange={e => set('colors', e.target.value)} />}
+        {has('soldOut') && (
+          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+            <input type="checkbox" checked={form.soldOut} onChange={e => set('soldOut', e.target.checked)} className="w-4 h-4" />
+            Mark as sold out
+          </label>
+        )}
+
+        <textarea className={inputCls + " sm:col-span-2 min-h-[80px] resize-y"} placeholder="Description" value={form.description} onChange={e => set('description', e.target.value)} />
+        <input className={inputCls + " sm:col-span-2"} placeholder="Image URL" value={form.image_url} onChange={e => set('image_url', e.target.value)} />
+      </div>
+      <button
+        type="submit" disabled={saving}
+        className="mt-4 rounded-xl px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        style={{ background: type.accent }}
+      >
+        {saving ? 'Saving…' : (editingProduct ? 'Update Product' : 'Save Product')}
+      </button>
+    </form>
+  );
+}
+
+// ===== Products tab =====
+function ProductsTab({ storeSlug, products, loading, onEdit, onDelete, editingProduct, onSaved, onCancelEdit }) {
+  const type = STORE_TYPES[storeSlug];
+
+  if (type.readOnly) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-800 text-sm leading-relaxed">
+        ⚡ <strong>{type.label}</strong> pulls its catalogue live from Shopify's Storefront API, not from this Firestore database.
+        To manage {type.label}'s products, use your Shopify Admin directly — this panel can't edit them.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <ProductForm storeSlug={storeSlug} editingProduct={editingProduct} onSaved={onSaved} onCancelEdit={onCancelEdit} />
+      <div className="bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-black/5">
+          <h2 className="font-display text-xl font-bold">Products</h2>
+        </div>
+        {loading ? (
+          <div className="p-10 text-center text-black/40 text-sm">Loading…</div>
+        ) : products.length === 0 ? (
+          <div className="p-10 text-center text-black/40 text-sm">No products yet — add your first one above.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-wider text-black/40 border-b border-black/5">
+                  <th className="px-6 py-3 font-medium">Image</th>
+                  <th className="px-6 py-3 font-medium">Name</th>
+                  <th className="px-6 py-3 font-medium">Info</th>
+                  <th className="px-6 py-3 font-medium">Price</th>
+                  <th className="px-6 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(p => {
+                  let info = p.category || '';
+                  if (type.fields.includes('spice') && p.spice) info += ` · 🌶️ ${p.spice}`;
+                  if (type.fields.includes('sku')) info = p.sku || '';
+                  if (type.fields.includes('soldOut') && p.soldOut) info += ' · SOLD OUT';
+                  return (
+                    <tr key={p.id} className="border-b border-black/5 last:border-0 hover:bg-black/[0.015]">
+                      <td className="px-6 py-3">
+                        {(p.image_url || p.img) ? (
+                          <img src={p.image_url || p.img} className="w-10 h-10 rounded-lg object-cover" alt={p.name} />
+                        ) : <span className="text-lg">📦</span>}
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="font-semibold">{p.name}</div>
+                        <div className="text-xs text-black/40 max-w-xs truncate">{p.description || p.desc || ''}</div>
+                      </td>
+                      <td className="px-6 py-3 text-black/60">{info}</td>
+                      <td className="px-6 py-3 font-mono-data">{type.currency}{p.price}</td>
+                      <td className="px-6 py-3 text-right space-x-2">
+                        <button onClick={() => onEdit(p)} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/5 hover:bg-black/10">Edit</button>
+                        <button onClick={() => onDelete(p.id)} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100">Delete</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ===== Orders tab =====
+function OrdersTab({ storeSlug, orders, loading, onStatusChange }) {
+  const type = STORE_TYPES[storeSlug];
+
+  if (type.readOnly) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-800 text-sm leading-relaxed">
+        ⚡ <strong>{type.label}</strong>'s checkout hands off straight to WhatsApp and never writes an order record to this database —
+        there's nothing to show here. Manage {type.label} orders directly in WhatsApp.
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-black/5">
+        <h2 className="font-display text-xl font-bold">Orders</h2>
+      </div>
+      {loading ? (
+        <div className="p-10 text-center text-black/40 text-sm">Loading…</div>
+      ) : orders.length === 0 ? (
+        <div className="p-10 text-center text-black/40 text-sm">No orders yet.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wider text-black/40 border-b border-black/5">
+                <th className="px-6 py-3 font-medium">Customer</th>
+                <th className="px-6 py-3 font-medium">Items</th>
+                <th className="px-6 py-3 font-medium">Total</th>
+                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium">Placed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map(o => {
+                const customerName = o.customer?.name || o.customerName || 'Guest';
+                const itemsSummary = Array.isArray(o.items) ? o.items.map(i => `${i.name} x${i.qty}`).join(', ') : '—';
+                const status = o.status || 'pending';
+                const placedDate = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
+                return (
+                  <tr key={o.id} className="border-b border-black/5 last:border-0 hover:bg-black/[0.015]">
+                    <td className="px-6 py-3">
+                      <div className="font-semibold">{customerName}</div>
+                      {o.customer?.phone && <div className="text-xs text-black/40">{o.customer.phone}</div>}
+                    </td>
+                    <td className="px-6 py-3 max-w-xs text-black/60 text-xs">{itemsSummary}</td>
+                    <td className="px-6 py-3 font-mono-data">{type.currency}{Number(o.total || 0).toLocaleString()}</td>
+                    <td className="px-6 py-3">
+                      <select
+                        value={status}
+                        onChange={(e) => onStatusChange(o.id, e.target.value)}
+                        className="text-xs border border-black/10 rounded-full px-2.5 py-1.5 outline-none"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="fulfilled">Fulfilled</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-3 text-black/50 text-xs">{placedDate}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== Sidebar =====
+function Sidebar({ storeSlug, onSwitchStore, activeTab, onTabChange, onLogout }) {
+  const type = STORE_TYPES[storeSlug];
+  return (
+    <aside className="w-full lg:w-64 bg-[#14151F] text-white flex-shrink-0 lg:min-h-screen">
+      <div className="p-5 border-b border-white/10">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-1">De Prudent</p>
+        <h1 className="font-display text-xl font-bold">Store Admin</h1>
+      </div>
+
+      <div className="p-4 border-b border-white/10">
+        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2 px-1">Managing</p>
+        <div className="grid grid-cols-2 gap-2">
+          {STORE_ORDER.map(slug => {
+            const t = STORE_TYPES[slug];
+            const active = storeSlug === slug;
+            return (
+              <button
+                key={slug} onClick={() => onSwitchStore(slug)}
+                className="text-left rounded-xl px-2.5 py-2 transition-all border"
+                style={{
+                  borderColor: active ? t.accent : 'rgba(255,255,255,0.08)',
+                  background: active ? t.accent + '22' : 'transparent'
+                }}
+              >
+                <div className="text-sm leading-none mb-1">{t.emoji}</div>
+                <div className="text-[11px] font-semibold" style={{ color: active ? t.accent : 'rgba(255,255,255,0.5)' }}>{t.label}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <nav className="p-4 space-y-1">
+        {[['products', '📦 Products'], ['orders', '🧾 Orders']].map(([key, label]) => (
+          <button
+            key={key} onClick={() => onTabChange(key)}
+            className="w-full text-left text-sm font-medium rounded-xl px-3.5 py-2.5 transition-colors"
+            style={{
+              background: activeTab === key ? type.accent : 'transparent',
+              color: activeTab === key ? '#fff' : 'rgba(255,255,255,0.6)'
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      <div className="p-4 mt-auto border-t border-white/10 space-y-2">
+        <a
+          href={`${storeSlug}.html`} target="_blank" rel="noreferrer"
+          className="block text-center text-sm font-medium rounded-xl px-3.5 py-2.5 border border-white/15 text-white/80 hover:bg-white/5"
+        >
+          🛒 View {type.label}
+        </a>
+        <button
+          onClick={onLogout}
+          className="w-full text-center text-sm font-medium rounded-xl px-3.5 py-2.5 bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+        >
+          Logout
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+// ===== Main App =====
+function App() {
+  const [firebaseReady, setFirebaseReady] = useState(!!window.__firebase);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [storeSlug, setStoreSlug] = useState(getStoreFromUrl());
+  const [activeTab, setActiveTab] = useState('products');
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    if (firebaseReady) return;
+    const interval = setInterval(() => {
+      if (window.__firebase) {
+        setFirebaseReady(true);
+        clearInterval(interval);
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, [firebaseReady]);
+
+  useEffect(() => {
+    document.getElementById('pageTitle').textContent = `${STORE_TYPES[storeSlug].label} – Store Admin`;
+  }, [storeSlug]);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); };
+
+  const loadData = useCallback(async () => {
+    if (!firebaseReady) return;
+    const type = STORE_TYPES[storeSlug];
+    setLoading(true);
+    const { db, collection, query, where, getDocs } = window.__firebase;
+
+    if (!type.readOnly) {
       try {
         const q = query(collection(db, "products"), where("storeId", "==", storeSlug));
         const snap = await getDocs(q);
-        allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        document.getElementById('dashProducts').textContent = allProducts.length;
-        renderProducts();
+        setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) {
-        showMsg('Error loading products: ' + err.message, true);
-      }
-      loadOrders();
-    }
-
-    async function loadOrders() {
-      try {
-        const q = query(collection(db, "orders"), where("storeId", "==", storeSlug));
-        const snap = await getDocs(q);
-        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderOrders();
-        renderOrderStats();
-      } catch (err) {
-        // Orders collection may not exist yet for this store — that's fine, show empty state.
-        allOrders = [];
-        renderOrders();
-        renderOrderStats();
-      }
-    }
-
-    function renderOrderStats() {
-      document.getElementById('dashOrders').textContent = allOrders.length;
-      const pending = allOrders.filter(o => (o.status || 'pending') === 'pending').length;
-      document.getElementById('dashPending').textContent = pending;
-      const revenue = allOrders
-        .filter(o => (o.status || 'pending') !== 'cancelled')
-        .reduce((sum, o) => sum + (Number(o.total) || 0), 0);
-      const currencySymbol = storeSlug === 'restaurant' ? '₦' : (storeSlug === 'luxury' ? '$' : '€');
-      document.getElementById('dashRevenue').textContent = currencySymbol + revenue.toLocaleString();
-    }
-
-    function renderOrders() {
-      const tbody = document.querySelector('#ordersTable tbody');
-      if (!allOrders.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No orders yet.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = allOrders.map(o => {
-        const customerName = o.customer?.name || o.customerName || 'Guest';
-        const itemsSummary = Array.isArray(o.items) ? o.items.map(i => `${i.name} x${i.qty}`).join(', ') : '—';
-        const status = o.status || 'pending';
-        const placedDate = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString() : '—';
-        return `
-          <tr>
-            <td><strong>${customerName}</strong>${o.customer?.phone ? `<br><small>${o.customer.phone}</small>` : ''}</td>
-            <td style="max-width:220px;">${itemsSummary}</td>
-            <td>${Number(o.total || 0).toLocaleString()}</td>
-            <td>
-              <select class="order-status-select" data-id="${o.id}">
-                <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
-                <option value="fulfilled" ${status==='fulfilled'?'selected':''}>Fulfilled</option>
-                <option value="cancelled" ${status==='cancelled'?'selected':''}>Cancelled</option>
-              </select>
-            </td>
-            <td>${placedDate}</td>
-          </tr>`;
-      }).join('');
-
-      document.querySelectorAll('.order-status-select').forEach(sel => {
-        sel.addEventListener('change', async () => {
-          try {
-            await updateDoc(doc(db, "orders", sel.dataset.id), { status: sel.value });
-            showMsg('✅ Order status updated!');
-            loadOrders();
-          } catch (err) {
-            showMsg('❌ ' + err.message, true);
-          }
-        });
-      });
-    }
-
-    function renderProducts() {
-      const type = STORE_TYPES[storeSlug];
-      const tbody = document.querySelector('#productTable tbody');
-      tbody.innerHTML = allProducts.map(p => {
-        let infoCol = p.category || '';
-        if (type.fields.includes('spice') && p.spice) infoCol += ` · 🌶️${p.spice}`;
-        if (type.fields.includes('sku')) infoCol = p.sku || '';
-        if (type.fields.includes('soldOut') && p.soldOut) infoCol += ' · SOLD OUT';
-        return `
-        <tr>
-          <td>${p.image_url || p.img ? `<img src="${p.image_url || p.img}" class="product-img">` : '📦'}</td>
-          <td><strong>${p.name}</strong><br><small>${p.description || p.desc || ''}</small></td>
-          <td>${infoCol}</td>
-          <td>${p.price}</td>
-          <td>
-            <button class="edit-btn" data-id="${p.id}">Edit</button>
-            <button class="danger delete-btn" data-id="${p.id}">Delete</button>
-          </td>
-        </tr>`;
-      }).join('');
-
-      document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => editProduct(btn.dataset.id)));
-      document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => deleteProduct(btn.dataset.id)));
-    }
-
-    document.getElementById('productForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const type = STORE_TYPES[storeSlug];
-      try {
-        const payload = {
-          storeId: storeSlug,
-          name: document.getElementById('name').value.trim(),
-          price: document.getElementById('price').value.trim(),
-          description: document.getElementById('description').value.trim(),
-          image_url: document.getElementById('imageUrl').value.trim()
-        };
-        if (type.fields.includes('category')) payload.category = document.getElementById('category').value;
-        if (type.fields.includes('spice')) payload.spice = document.getElementById('spice').value.trim() || null;
-        if (type.fields.includes('sku')) payload.sku = document.getElementById('sku').value.trim();
-        if (type.fields.includes('sizes')) payload.sizes = document.getElementById('sizes').value.split(',').map(s => s.trim()).filter(Boolean);
-        if (type.fields.includes('colors')) {
-          payload.colors = document.getElementById('colors').value.split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name, hex: '#CCCCCC' }));
-        }
-        if (type.fields.includes('soldOut')) payload.soldOut = document.getElementById('soldOut').checked;
-
-        if (currentEditId) {
-          await updateDoc(doc(db, "products", currentEditId), payload);
-          showMsg('✅ Product updated!');
-        } else {
-          await addDoc(collection(db, "products"), { ...payload, created_at: serverTimestamp() });
-          showMsg('✅ Product saved!');
-        }
-        resetForm();
-        loadAll();
-      } catch (err) {
-        showMsg('❌ ' + err.message, true);
-      }
-    });
-
-    function editProduct(id) {
-      const product = allProducts.find(p => p.id === id);
-      if (!product) return;
-      document.getElementById('editId').value = product.id;
-      document.getElementById('name').value = product.name || '';
-      document.getElementById('price').value = product.price || '';
-      document.getElementById('description').value = product.description || product.desc || '';
-      document.getElementById('imageUrl').value = product.image_url || product.img || '';
-      document.getElementById('category').value = product.category || '';
-      document.getElementById('spice').value = product.spice || '';
-      document.getElementById('sku').value = product.sku || '';
-      document.getElementById('sizes').value = Array.isArray(product.sizes) ? product.sizes.join(',') : '';
-      document.getElementById('colors').value = Array.isArray(product.colors) ? product.colors.map(c => c.name).join(',') : '';
-      document.getElementById('soldOut').checked = !!product.soldOut;
-      document.getElementById('formTitle').textContent = 'Edit Product';
-      document.getElementById('cancelEditBtn').classList.remove('hidden');
-      document.getElementById('saveBtn').textContent = 'Update Product';
-      currentEditId = id;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function resetForm() {
-      document.getElementById('productForm').reset();
-      document.getElementById('editId').value = '';
-      document.getElementById('formTitle').textContent = 'Add Product';
-      document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('saveBtn').textContent = 'Save Product';
-      currentEditId = null;
-    }
-    document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
-
-    async function deleteProduct(id) {
-      if (!confirm('Delete this product?')) return;
-      try {
-        await deleteDoc(doc(db, "products", id));
-        showMsg('🗑️ Deleted!');
-        loadAll();
-      } catch (err) {
-        showMsg('❌ ' + err.message, true);
-      }
-    }
-
-    // ---- Tabs ----
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-      });
-    });
-
-    // ---- Store switcher (re-prompts login since each store has its own password) ----
-    document.getElementById('storeSwitcher').addEventListener('change', (e) => {
-      const newSlug = e.target.value;
-      window.location.href = `store-admin.html?store=${newSlug}`;
-    });
-
-    // ---- DYNAMIC LOGIN (reads password from Firestore) ----
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const selectedStore = document.getElementById('storeSelectLogin').value;
-      const enteredPassword = document.getElementById('passwordInput').value;
-      if (!enteredPassword) {
-        document.getElementById('loginError').textContent = 'Please enter a password';
-        return;
+        setProducts([]);
       }
       try {
-        const storeRef = doc(db, "stores", selectedStore);
-        const storeSnap = await getDoc(storeRef);
-
-        if (!storeSnap.exists()) {
-          document.getElementById('loginError').textContent = `No password set up yet for "${selectedStore}" — add a "stores/${selectedStore}" document in Firestore with a password field.`;
-          return;
-        }
-        if (storeSnap.data().password === enteredPassword) {
-          storeSlug = selectedStore;
-          document.getElementById('loginBox').classList.add('hidden');
-          document.getElementById('adminBox').classList.remove('hidden');
-          applyStoreType();
-          loadAll();
-        } else {
-          document.getElementById('loginError').textContent = 'Wrong password';
-        }
+        const q2 = query(collection(db, "orders"), where("storeId", "==", storeSlug));
+        const snap2 = await getDocs(q2);
+        setOrders(snap2.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) {
-        document.getElementById('loginError').textContent = 'Error checking password';
+        setOrders([]);
       }
-    });
+    } else {
+      setProducts([]);
+      setOrders([]);
+    }
+    setLoading(false);
+  }, [storeSlug, firebaseReady]);
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      document.getElementById('adminBox').classList.add('hidden');
-      document.getElementById('loginBox').classList.remove('hidden');
-    });
-  </script>
+  useEffect(() => { if (loggedIn) loadData(); }, [loggedIn, storeSlug, firebaseReady, loadData]);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this product?')) return;
+    const { db, doc, deleteDoc } = window.__firebase;
+    try {
+      await deleteDoc(doc(db, "products", id));
+      showToast('🗑️ Product deleted');
+      loadData();
+    } catch (err) {
+      alert('Error deleting: ' + err.message);
+    }
+  };
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    const { db, doc, updateDoc } = window.__firebase;
+    try {
+      await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+      showToast('✅ Order status updated');
+      loadData();
+    } catch (err) {
+      alert('Error updating order: ' + err.message);
+    }
+  };
+
+  const stats = useMemo(() => {
+    const pending = orders.filter(o => (o.status || 'pending') === 'pending').length;
+    const revenue = orders.filter(o => (o.status || 'pending') !== 'cancelled').reduce((s, o) => s + (Number(o.total) || 0), 0);
+    return { products: products.length, orders: orders.length, pending, revenue };
+  }, [products, orders]);
+
+  if (!loggedIn) {
+    return <LoginScreen onLogin={(slug) => { setStoreSlug(slug); setLoggedIn(true); }} />;
+  }
+
+  const type = STORE_TYPES[storeSlug];
+
+  return (
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      <Sidebar
+        storeSlug={storeSlug}
+        onSwitchStore={(slug) => { setStoreSlug(slug); setEditingProduct(null); setActiveTab('products'); }}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onLogout={() => setLoggedIn(false)}
+      />
+
+      <main className="flex-1 p-5 lg:p-8 max-w-6xl">
+        {toast && (
+          <div className="fixed top-5 right-5 bg-black text-white text-sm px-4 py-2.5 rounded-xl shadow-lg animate-fade-in z-50">
+            {toast}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StatCard label="Products" value={type.readOnly ? '—' : stats.products} accent={type.accent} />
+          <StatCard label="Orders" value={type.readOnly ? '—' : stats.orders} accent={type.accent} />
+          <StatCard label="Pending" value={type.readOnly ? '—' : stats.pending} accent={type.accent} />
+          <StatCard label="Revenue" value={type.readOnly ? '—' : `${type.currency}${stats.revenue.toLocaleString()}`} accent={type.accent} />
+        </div>
+
+        {activeTab === 'products' ? (
+          <ProductsTab
+            storeSlug={storeSlug} products={products} loading={loading}
+            editingProduct={editingProduct}
+            onEdit={(p) => { setEditingProduct(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onDelete={handleDelete}
+            onSaved={() => { setEditingProduct(null); showToast('✅ Product saved'); loadData(); }}
+            onCancelEdit={() => setEditingProduct(null)}
+          />
+        ) : (
+          <OrdersTab storeSlug={storeSlug} orders={orders} loading={loading} onStatusChange={handleStatusChange} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
 </body>
 </html>
