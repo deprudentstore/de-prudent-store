@@ -383,6 +383,7 @@
       <a href="#" onclick="showPage('shopify-guide');return false;">Shopify Guide</a>
       <a href="seo.html">SEO</a>
       <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
       <a href="#" onclick="showPage('contact');return false;">Contact</a>
       <a href="https://wa.me/2349162306809?text=Hi%20De%20Prudent%2C%20I%20want%20a%20custom%20store" target="_blank" class="btn-gold" style="padding:10px 22px;font-size:13px">💬 Get Your Store</a>
     </nav>
@@ -397,6 +398,7 @@
     <a href="#" onclick="showPage('shopify-guide');closeMobileMenu();return false;">Shopify Guide</a>
     <a href="seo.html">SEO</a>
     <a href="about.html">About</a>
+    <a href="projects.html">Projects</a>
     <a href="#" onclick="showPage('contact');closeMobileMenu();return false;">Contact</a>
     <a href="https://wa.me/2349162306809?text=Hi%20De%20Prudent%2C%20I%20want%20a%20custom%20store" target="_blank" class="btn-gold">💬 Get Your Store</a>
   </div>
@@ -879,6 +881,7 @@
           <a href="#" onclick="showPage('shopify-guide');return false;">Shopify Guide</a>
           <a href="seo.html">SEO Services</a>
           <a href="about.html">About</a>
+          <a href="projects.html">Projects</a>
           <a href="#" onclick="showPage('contact');return false;">Contact</a>
         </div>
         <div class="footer-col">
@@ -1207,21 +1210,56 @@
       setTimeout(() => { if (greeting.parentNode) greeting.remove(); }, 12000);
     }, 3500);
 
-    // ===== Free-text input =====
-    // Note: this deploys via drag-and-drop with no backend, so freeform questions
-    // route straight to WhatsApp instead of attempting a network call that would just fail.
+    // ===== Free-text AI input (calls Netlify Function; falls back gracefully if unavailable) =====
     const chatInput = document.getElementById('chatInput');
     const chatSendBtn = document.getElementById('chatSendBtn');
+    let aiAvailable = true; // flips false after first failure so we stop retrying pointlessly this session
 
-    function sendFreeText() {
+    function showTyping() {
+      const typing = document.createElement('div');
+      typing.className = 'chat-typing';
+      typing.id = 'chatTypingIndicator';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      body.appendChild(typing);
+      body.scrollTop = body.scrollHeight;
+    }
+    function hideTyping() {
+      const t = document.getElementById('chatTypingIndicator');
+      if (t) t.remove();
+    }
+
+    async function sendFreeText() {
       const text = chatInput.value.trim();
       if (!text) return;
       addMessage(text, 'user');
       chatInput.value = '';
-      setTimeout(() => {
-        addMessage("Good question — that's best answered by a real person. Let's get you straight to WhatsApp.", 'bot');
+
+      if (!aiAvailable) {
+        setTimeout(() => {
+          addMessage("Let's get you straight to a real person on WhatsApp for that.", 'bot');
+          addQuickReplies([{ label: '💬 Chat on WhatsApp now', href: waLink(text) }, { label: '⬅️ Back to menu', key: 'menu' }]);
+        }, 300);
+        return;
+      }
+
+      showTyping();
+      try {
+        const res = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        });
+        hideTyping();
+        if (!res.ok) throw new Error('Function returned ' + res.status);
+        const data = await res.json();
+        addMessage(data.reply || "Sorry, I couldn't process that.", 'bot');
+        addQuickReplies([{ label: '💬 Continue on WhatsApp', href: waLink(text) }, { label: '⬅️ Back to menu', key: 'menu' }]);
+      } catch (e) {
+        hideTyping();
+        aiAvailable = false; // don't keep hitting a missing/broken endpoint for the rest of the session
+        addMessage("I'm not able to answer freeform questions right now — but I can connect you to a real person.", 'bot');
         addQuickReplies([{ label: '💬 Chat on WhatsApp now', href: waLink(text) }, { label: '⬅️ Back to menu', key: 'menu' }]);
-      }, 300);
+      }
     }
     chatSendBtn.addEventListener('click', sendFreeText);
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendFreeText(); });
