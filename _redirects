@@ -24,5 +24,8 @@
 # Projects page
 /projects                            /projects.html                          200
 
+# Features page
+/features                            /features.html                          200
+
 # SPA catch-all — MUST BE LAST
 /*                                  /index.html                             200
