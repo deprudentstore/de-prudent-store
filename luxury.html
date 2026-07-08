@@ -530,7 +530,7 @@
     grid.innerHTML = visible.map((p, i) => `
       <div class="edit-card reveal ${layouts[i % layouts.length]}" data-id="${p.id}">
         ${p.soldOut ? '<div class="sold-ribbon">Waitlist</div>' : ''}
-        <img src="${p.img}" alt="${p.name}" loading="lazy">
+        <img src="${p.img || p.image_url}" alt="${p.name}" loading="lazy">
         <div class="edit-overlay">
           <div class="edit-name">${p.name}</div>
           ${cardRatingHtml(p.id)}
@@ -554,11 +554,11 @@
     const p = PRODUCTS.find(x => x.id === id);
     if (!p) return;
     qvState = { product: p, color: p.colors[0].name, size: p.soldOut ? null : p.sizes[0] };
-    document.getElementById('qvImg').src = p.img;
+    document.getElementById('qvImg').src = p.img || p.image_url;
     document.getElementById('qvImg').alt = p.name;
     document.getElementById('qvSku').textContent = 'MRQ — ' + p.sku;
     document.getElementById('qvName').textContent = p.name;
-    document.getElementById('qvDesc').textContent = p.desc;
+    document.getElementById('qvDesc').textContent = p.desc || p.description || '';
     document.getElementById('qvColorName').textContent = qvState.color;
     document.getElementById('qvSwatches').innerHTML = p.colors.map(c =>
       `<div class="swatch ${c.name===qvState.color?'selected':''}" data-color="${c.name}" style="background:${c.hex}" title="${c.name}"></div>`

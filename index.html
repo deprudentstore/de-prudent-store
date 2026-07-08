@@ -516,6 +516,19 @@
       <a href="#" onclick="showPage('pricing');return false;" class="btn-gold" style="margin-top:30px;">See Full Growth Packages →</a>
     </div>
   </section>
+
+  <!-- Newsletter signup — homepage -->
+  <section class="section" id="home-newsletter" style="text-align:center;">
+    <div class="section-inner" style="max-width:600px;">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:12px;">📬 Get free store‑building tips & early access</p>
+      <form class="newsletter-form" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <label style="position:absolute;left:-9999px;">Email address</label>
+        <input type="email" class="newsletter-email" placeholder="Your email address" required style="padding:12px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Outfit',sans-serif;min-width:240px;outline:none;" />
+        <button type="submit" class="btn-gold" style="padding:12px 28px;font-size:14px;">Subscribe</button>
+      </form>
+      <p class="newsletter-msg" style="font-size:13px;margin-top:10px;" role="status" aria-live="polite"></p>
+    </div>
+  </section>
 </section>
 
 <!-- PAGE: DEMOS -->
@@ -850,12 +863,12 @@
       </div>
       <div style="margin:30px 0 20px;">
         <p style="font-size:14px;color:var(--muted);margin-bottom:12px;">📬 Get free store‑building tips & early access</p>
-        <form id="newsletterForm" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <label for="newsletterEmail" style="position:absolute;left:-9999px;">Email address</label>
-          <input type="email" id="newsletterEmail" placeholder="Your email address" required style="padding:12px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Outfit',sans-serif;min-width:240px;outline:none;" />
+        <form class="newsletter-form" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <label style="position:absolute;left:-9999px;">Email address</label>
+          <input type="email" class="newsletter-email" placeholder="Your email address" required style="padding:12px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Outfit',sans-serif;min-width:240px;outline:none;" />
           <button type="submit" class="btn-gold" style="padding:12px 28px;font-size:14px;">Subscribe</button>
         </form>
-        <p id="newsletterMsg" style="font-size:13px;margin-top:10px;" role="status" aria-live="polite"></p>
+        <p class="newsletter-msg" style="font-size:13px;margin-top:10px;" role="status" aria-live="polite"></p>
       </div>
       <p class="cta-note">Typically replies within 1 hour · Available Mon–Sat · All time zones welcome</p>
     </div>
@@ -1003,29 +1016,32 @@
   // ===== Newsletter (De Prudent backend API — replaces Firebase) =====
   const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
 
-  document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('newsletterEmail').value.trim();
-    const msg = document.getElementById('newsletterMsg');
-    if (!email) {
-      msg.textContent = 'Please enter your email address.';
-      msg.style.color = '#f87171';
-      return;
-    }
-    try {
-      const res = await fetch(`${API_BASE}/stores/site/newsletter`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      if (!res.ok) throw new Error('Request failed');
-      msg.textContent = '✅ You\'re subscribed! Check your inbox.';
-      msg.style.color = '#34D399';
-      document.getElementById('newsletterEmail').value = '';
-    } catch (err) {
-      msg.textContent = '❌ Something went wrong. Please try again.';
-      msg.style.color = '#f87171';
-    }
+  document.querySelectorAll('.newsletter-form').forEach(function(form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = form.querySelector('.newsletter-email');
+      const msg = form.parentElement.querySelector('.newsletter-msg');
+      const email = emailInput.value.trim();
+      if (!email) {
+        msg.textContent = 'Please enter your email address.';
+        msg.style.color = '#f87171';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/site/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msg.textContent = '✅ You\'re subscribed! Check your inbox.';
+        msg.style.color = '#34D399';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.style.color = '#f87171';
+      }
+    });
   });
 
   // ===== Set initial page =====
