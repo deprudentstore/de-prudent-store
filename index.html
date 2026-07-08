@@ -1000,50 +1000,33 @@
 
   // ===== Blog now uses real linked pages (blog-*.html) =====
 
-  // ===== Firebase + Newsletter =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-    authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-    projectId: "deprudent-store-platform-cce59",
-    storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-    messagingSenderId: "274718749378",
-    appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-  };
-  const script1 = document.createElement('script');
-  script1.src = "https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js";
-  document.head.appendChild(script1);
-  const script2 = document.createElement('script');
-  script2.src = "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js";
-  document.head.appendChild(script2);
+  // ===== Newsletter (De Prudent backend API — replaces Firebase) =====
+  const API_BASE = "https://deprudent-backend.vercel.app/api";
 
-  script2.onload = function() {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const email = document.getElementById('newsletterEmail').value.trim();
-      const msg = document.getElementById('newsletterMsg');
-      if (!email) {
-        msg.textContent = 'Please enter your email address.';
-        msg.style.color = '#f87171';
-        return;
-      }
-      try {
-        await db.collection('newsletter').add({
-          email: email,
-          source: 'single-file',
-          subscribed_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        msg.textContent = '✅ You\'re subscribed! Check your inbox.';
-        msg.style.color = '#34D399';
-        document.getElementById('newsletterEmail').value = '';
-      } catch (err) {
-        msg.textContent = '❌ Something went wrong. Please try again.';
-        msg.style.color = '#f87171';
-      }
-    });
-  };
+  document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value.trim();
+    const msg = document.getElementById('newsletterMsg');
+    if (!email) {
+      msg.textContent = 'Please enter your email address.';
+      msg.style.color = '#f87171';
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/stores/site/newsletter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) throw new Error('Request failed');
+      msg.textContent = '✅ You\'re subscribed! Check your inbox.';
+      msg.style.color = '#34D399';
+      document.getElementById('newsletterEmail').value = '';
+    } catch (err) {
+      msg.textContent = '❌ Something went wrong. Please try again.';
+      msg.style.color = '#f87171';
+    }
+  });
 
   // ===== Set initial page =====
   showPage('home');

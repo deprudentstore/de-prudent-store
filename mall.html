@@ -326,21 +326,10 @@
   </div>
 
   <script type="module">
-    // ===== YOUR FIREBASE CONFIG (unchanged) =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-      authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-      projectId: "deprudent-store-platform-cce59",
-      storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-      messagingSenderId: "274718749378",
-      appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-    };
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // ===== De Prudent backend API (replaces Firebase) =====
+    // Update this once your backend is deployed on Vercel, e.g.
+    // "https://deprudent-backend.vercel.app/api"
+    const API_BASE = "https://deprudent-backend.vercel.app/api";
 
     const pathParts = window.location.pathname.split('/').filter(p => p);
     let storeSlug = pathParts[0] || 'mall';
@@ -359,11 +348,12 @@
           return;
         }
         try {
-          await addDoc(collection(db, "newsletter"), {
-            email: email,
-            storeId: storeSlug,
-            subscribed_at: serverTimestamp()
+          const res = await fetch(`${API_BASE}/stores/${storeSlug}/newsletter`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
           });
+          if (!res.ok) throw new Error('Request failed');
           msgEl.textContent = '✅ You\'re subscribed!';
           msgEl.className = 'newsletter-msg success';
           document.getElementById('newsletterEmail').value = '';
@@ -389,10 +379,10 @@
 
     async function fetchProducts() {
       try {
-        const q = query(collection(db, "products"), where("storeId", "==", storeSlug));
-        const snapshot = await getDocs(q);
-        let products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (!products.length) products = FALLBACK_PRODUCTS;
+        const res = await fetch(`${API_BASE}/products?store=${storeSlug}`);
+        if (!res.ok) throw new Error('Request failed');
+        let products = await res.json();
+        if (!Array.isArray(products) || !products.length) products = FALLBACK_PRODUCTS;
         allProductsGlobal = products;
       } catch (e) {
         allProductsGlobal = FALLBACK_PRODUCTS;

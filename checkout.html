@@ -54,19 +54,8 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-      authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-      projectId: "deprudent-store-platform-cce59",
-      storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-      messagingSenderId: "274718749378",
-      appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // De Prudent backend API (replaces Firebase). Update after deploying to Vercel.
+    const API_BASE = "https://deprudent-backend.vercel.app/api";
 
     const urlParams = new URLSearchParams(window.location.search);
     const storeSlug = urlParams.get('store') || 'mall';
@@ -85,9 +74,13 @@
       document.getElementById('orderTotal').textContent = `€${total.toFixed(2)}`;
     }
 
-    const storeRef = doc(db, "stores", storeSlug);
-    const storeSnap = await getDoc(storeRef);
-    const storeData = storeSnap.exists() ? storeSnap.data() : {};
+    let storeData = {};
+    try {
+      const storeRes = await fetch(`${API_BASE}/stores/${storeSlug}`);
+      if (storeRes.ok) storeData = await storeRes.json();
+    } catch (e) {
+      // Falls back to an empty storeData — WhatsApp confirm button still works.
+    }
     document.getElementById('storeNameDisplay').textContent = storeData.name || storeSlug;
 
     if (storeData.bankName && storeData.accountNumber && storeData.accountName) {
@@ -125,7 +118,8 @@
       if (cart.length === 0) return;
       const summary = cart.map(i => `${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}`).join('%0A');
       const total = cart.reduce((s,i) => s + i.price * i.qty, 0).toFixed(2);
-      window.open(`https://wa.me/2349162306809?text=Order%20from%20${storeSlug}%3A%0A${summary}%0A%0ATotal%3A%20€${total}`, '_blank');
+      const waNumber = storeData.whatsappNumber || '2349162306809';
+      window.open(`https://wa.me/${waNumber}?text=Order%20from%20${storeSlug}%3A%0A${summary}%0A%0ATotal%3A%20€${total}`, '_blank');
     });
   </script>
   <script src="https://js.paystack.co/v1/inline.js"></script>

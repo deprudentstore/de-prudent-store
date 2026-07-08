@@ -22,33 +22,35 @@
 <body class="bg-[#F6F4EF] text-[#1C1C24]">
 <div id="root"></div>
 
-<!-- Firebase bridge: loaded as a module, exposes db + functions on window for the React app to use -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import {
-    getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-    authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-    projectId: "deprudent-store-platform-cce59",
-    storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-    messagingSenderId: "274718749378",
-    appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.__firebase = {
-    db, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, serverTimestamp
-  };
-  window.dispatchEvent(new Event('firebase-ready'));
-</script>
-
 <script type="text/babel">
 const { useState, useEffect, useMemo, useCallback } = React;
+
+// De Prudent backend API (replaces Firebase). Update after deploying to Vercel.
+const API_BASE = "https://deprudent-backend.vercel.app/api";
+
+// ===== Auth token helpers (JWT from POST /api/admin/login, kept in localStorage
+//        so the dashboard stays logged in across page reloads) =====
+function getToken() { return localStorage.getItem('deprudent_admin_token') || ''; }
+function setToken(token) { localStorage.setItem('deprudent_admin_token', token); }
+function clearToken() { localStorage.removeItem('deprudent_admin_token'); }
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  if (res.status === 401) {
+    clearToken();
+    throw new Error('Session expired. Please log in again.');
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
 
 // ===== Store type definitions — each store has its own schema, brand color, and currency =====
 const STORE_TYPES = {
@@ -91,6 +93,7 @@ function StatCard({ label, value, accent }) {
 // ===== Login screen =====
 function LoginScreen({ onLogin }) {
   const [selectedStore, setSelectedStore] = useState(getStoreFromUrl());
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -98,21 +101,23 @@ function LoginScreen({ onLogin }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    if (!password) { setError('Please enter a password'); return; }
-    if (!window.__firebase) { setError('Still connecting — try again in a moment.'); return; }
+    if (!email || !password) { setError('Please enter your email and password'); return; }
     setLoading(true);
     try {
-      const { db, doc, getDoc } = window.__firebase;
-      const snap = await getDoc(doc(db, "stores", selectedStore));
-      if (!snap.exists()) {
-        setError(`No password set up yet for "${selectedStore}" — add a "stores/${selectedStore}" document in Firestore with a password field.`);
-      } else if (snap.data().password === password) {
-        onLogin(selectedStore);
-      } else {
-        setError('Wrong password');
+      const res = await fetch(`${API_BASE}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Login failed');
+        return;
       }
+      setToken(data.token);
+      onLogin(selectedStore);
     } catch (err) {
-      setError('Error checking password: ' + err.message);
+      setError('Error logging in: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -147,8 +152,14 @@ function LoginScreen({ onLogin }) {
           </div>
 
           <input
+            type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="Admin email" autoComplete="username"
+            className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-black/30"
+          />
+
+          <input
             type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="Store password"
+            placeholder="Password" autoComplete="current-password"
             className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-black/30"
           />
 
@@ -159,13 +170,12 @@ function LoginScreen({ onLogin }) {
             className="w-full rounded-xl py-3 font-semibold text-sm text-white transition-opacity disabled:opacity-60"
             style={{ background: STORE_TYPES[selectedStore].accent }}
           >
-            {loading ? 'Checking…' : 'Login'}
+            {loading ? 'Logging in…' : 'Login'}
           </button>
         </form>
 
         <p className="text-[11px] text-black/35 leading-relaxed mt-5">
-          ⚠️ Demo login only — this compares the password in the browser against a Firestore document.
-          For a production admin panel, password checks should happen in a server-side function instead.
+          Pick the store you want to manage above, then log in with your admin email and password.
         </p>
       </div>
     </div>
@@ -205,11 +215,10 @@ function ProductForm({ storeSlug, editingProduct, onSaved, onCancelEdit }) {
     e.preventDefault();
     setSaving(true);
     try {
-      const { db, collection, addDoc, updateDoc, doc, serverTimestamp } = window.__firebase;
       const payload = {
-        storeId: storeSlug,
+        storeSlug: storeSlug,
         name: form.name.trim(),
-        price: form.price.trim(),
+        price: Number(form.price),
         description: form.description.trim(),
         image_url: form.image_url.trim(),
       };
@@ -221,9 +230,9 @@ function ProductForm({ storeSlug, editingProduct, onSaved, onCancelEdit }) {
       if (has('soldOut')) payload.soldOut = form.soldOut;
 
       if (editingProduct) {
-        await updateDoc(doc(db, "products", editingProduct.id), payload);
+        await apiFetch(`/admin/products/${editingProduct.id}`, { method: 'PUT', body: JSON.stringify(payload) });
       } else {
-        await addDoc(collection(db, "products"), { ...payload, created_at: serverTimestamp() });
+        await apiFetch('/admin/products', { method: 'POST', body: JSON.stringify(payload) });
       }
       onSaved();
       setForm(blank);
@@ -454,7 +463,7 @@ function Sidebar({ storeSlug, onSwitchStore, activeTab, onTabChange, onLogout })
       </div>
 
       <nav className="p-4 space-y-1">
-        {[['products', '📦 Products'], ['orders', '🧾 Orders']].map(([key, label]) => (
+        {[['products', '📦 Products'], ['orders', '🧾 Orders'], ['password', '🔑 Password']].map(([key, label]) => (
           <button
             key={key} onClick={() => onTabChange(key)}
             className="w-full text-left text-sm font-medium rounded-xl px-3.5 py-2.5 transition-colors"
@@ -486,10 +495,85 @@ function Sidebar({ storeSlug, onSwitchStore, activeTab, onTabChange, onLogout })
   );
 }
 
+// ===== Password tab — lets a logged-in admin change their own password =====
+function PasswordTab({ onChanged }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (newPassword.length < 8) {
+      setError('New password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('New password and confirmation do not match.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await apiFetch('/admin/me/password', {
+        method: 'PATCH',
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+      onChanged && onChanged();
+    } catch (err) {
+      setError(err.message || 'Failed to update password.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md">
+      <h2 className="font-display text-2xl font-bold mb-4">Change Password</h2>
+      <form onSubmit={handleSubmit} className="space-y-3 bg-white rounded-2xl p-5 border border-black/5 shadow-sm">
+        <div>
+          <label className="block text-xs font-semibold text-black/50 mb-1">Current password</label>
+          <input
+            type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)}
+            required autoComplete="current-password"
+            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-black/50 mb-1">New password</label>
+          <input
+            type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
+            required minLength={8} autoComplete="new-password"
+            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-black/50 mb-1">Confirm new password</label>
+          <input
+            type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+            required minLength={8} autoComplete="new-password"
+            className="w-full rounded-xl border border-black/10 px-3 py-2 text-sm"
+          />
+        </div>
+        {error && <p className="text-sm text-rose-500">{error}</p>}
+        <button
+          type="submit" disabled={saving}
+          className="w-full rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white bg-[#1C1C24] disabled:opacity-50"
+        >
+          {saving ? 'Saving…' : 'Update Password'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ===== Main App =====
 function App() {
-  const [firebaseReady, setFirebaseReady] = useState(!!window.__firebase);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(!!getToken());
   const [storeSlug, setStoreSlug] = useState(getStoreFromUrl());
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
@@ -499,40 +583,27 @@ function App() {
   const [toast, setToast] = useState('');
 
   useEffect(() => {
-    if (firebaseReady) return;
-    const interval = setInterval(() => {
-      if (window.__firebase) {
-        setFirebaseReady(true);
-        clearInterval(interval);
-      }
-    }, 50);
-    return () => clearInterval(interval);
-  }, [firebaseReady]);
-
-  useEffect(() => {
     document.getElementById('pageTitle').textContent = `${STORE_TYPES[storeSlug].label} – Store Admin`;
   }, [storeSlug]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); };
 
   const loadData = useCallback(async () => {
-    if (!firebaseReady) return;
     const type = STORE_TYPES[storeSlug];
     setLoading(true);
-    const { db, collection, query, where, getDocs } = window.__firebase;
 
     if (!type.readOnly) {
       try {
-        const q = query(collection(db, "products"), where("storeId", "==", storeSlug));
-        const snap = await getDocs(q);
-        setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        // Public route — no auth needed, same data every storefront uses.
+        const res = await fetch(`${API_BASE}/products?store=${storeSlug}`);
+        const list = res.ok ? await res.json() : [];
+        setProducts(Array.isArray(list) ? list.map(p => ({ ...p, id: p._id || p.id })) : []);
       } catch (err) {
         setProducts([]);
       }
       try {
-        const q2 = query(collection(db, "orders"), where("storeId", "==", storeSlug));
-        const snap2 = await getDocs(q2);
-        setOrders(snap2.docs.map(d => ({ id: d.id, ...d.data() })));
+        const list = await apiFetch(`/admin/orders?store=${storeSlug}`);
+        setOrders(Array.isArray(list) ? list.map(o => ({ ...o, id: o._id || o.id })) : []);
       } catch (err) {
         setOrders([]);
       }
@@ -541,15 +612,14 @@ function App() {
       setOrders([]);
     }
     setLoading(false);
-  }, [storeSlug, firebaseReady]);
+  }, [storeSlug]);
 
-  useEffect(() => { if (loggedIn) loadData(); }, [loggedIn, storeSlug, firebaseReady, loadData]);
+  useEffect(() => { if (loggedIn) loadData(); }, [loggedIn, storeSlug, loadData]);
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this product?')) return;
-    const { db, doc, deleteDoc } = window.__firebase;
     try {
-      await deleteDoc(doc(db, "products", id));
+      await apiFetch(`/admin/products/${id}`, { method: 'DELETE' });
       showToast('🗑️ Product deleted');
       loadData();
     } catch (err) {
@@ -558,9 +628,8 @@ function App() {
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
-    const { db, doc, updateDoc } = window.__firebase;
     try {
-      await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+      await apiFetch(`/admin/orders/${orderId}`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
       showToast('✅ Order status updated');
       loadData();
     } catch (err) {
@@ -587,7 +656,7 @@ function App() {
         onSwitchStore={(slug) => { setStoreSlug(slug); setEditingProduct(null); setActiveTab('products'); }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onLogout={() => setLoggedIn(false)}
+        onLogout={() => { clearToken(); setLoggedIn(false); }}
       />
 
       <main className="flex-1 p-5 lg:p-8 max-w-6xl">
@@ -613,8 +682,10 @@ function App() {
             onSaved={() => { setEditingProduct(null); showToast('✅ Product saved'); loadData(); }}
             onCancelEdit={() => setEditingProduct(null)}
           />
-        ) : (
+        ) : activeTab === 'orders' ? (
           <OrdersTab storeSlug={storeSlug} orders={orders} loading={loading} onStatusChange={handleStatusChange} />
+        ) : (
+          <PasswordTab onChanged={() => showToast('✅ Password updated')} />
         )}
       </main>
     </div>

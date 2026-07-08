@@ -223,19 +223,8 @@
 </aside>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-  authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-  projectId: "deprudent-store-platform-cce59",
-  storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-  messagingSenderId: "274718749378",
-  appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// De Prudent backend API (replaces Firebase). Update after deploying to Vercel.
+const API_BASE = "https://deprudent-backend.vercel.app/api";
 const STORE_SLUG = 'restaurant';
 const WHATSAPP_NUMBER = '2349162306809';
 const STORE_NAME = "Abeni";
@@ -319,9 +308,11 @@ function addToCart(id, name, price, img){
 
 async function fetchProducts(){
   try {
-    const q = query(collection(db,"products"), where("storeId","==",STORE_SLUG));
-    const snap = await getDocs(q);
-    if (!snap.empty) allProducts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    const res = await fetch(`${API_BASE}/products?store=${STORE_SLUG}`);
+    if (res.ok) {
+      const products = await res.json();
+      if (Array.isArray(products) && products.length) allProducts = products;
+    }
   } catch(e) { /* silently fall back to FALLBACK_MENU */ }
   renderCatNav();
   renderMenu();
@@ -400,7 +391,16 @@ document.getElementById('confirmOrderBtn').onclick = async () => {
   const msg = `🍽️ ORDER FROM ${STORE_NAME}%0A%0A*Customer:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Order:*%0A${items}%0A%0A*Total:* ₦${total.toLocaleString()}`;
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
   try {
-    await addDoc(collection(db,"orders"), { storeId: STORE_SLUG, customer:{name,phone,address}, items:cart, total, status:'pending', createdAt: serverTimestamp() });
+    await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        storeSlug: STORE_SLUG,
+        customer: { name, phone, address },
+        items: cart.map(i => ({ productId: i.id, name: i.name, price: i.price, qty: i.qty })),
+        total
+      })
+    });
   } catch(e) { /* non-blocking */ }
   cart = [];
   saveCart();

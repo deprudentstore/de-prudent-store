@@ -470,22 +470,11 @@
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDpzSx6cfyHgDc80V-mGMo-2ZQRY8AIuh8",
-    authDomain: "deprudent-store-platform-cce59.firebaseapp.com",
-    projectId: "deprudent-store-platform-cce59",
-    storageBucket: "deprudent-store-platform-cce59.firebasestorage.app",
-    messagingSenderId: "274718749378",
-    appId: "1:274718749378:web:66410bd2ad1d2ea895015b"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  // De Prudent backend API (replaces Firebase). Update after deploying to Vercel.
+  const API_BASE = "https://deprudent-backend.vercel.app/api";
   const STORE_SLUG = 'luxury';
 
-  // ===== Fallback catalogue (renders instantly; live Firestore data for storeId "luxury" overrides it if present) =====
+  // ===== Fallback catalogue (renders instantly; live backend data for store "luxury" overrides it if present) =====
   const FALLBACK_PRODUCTS = [
     { id:'p1', name:'The Atelier Coat', sku:'AC-014', price:340, img:'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=700&h=900&fit=crop', colors:[{name:'Ink Black',hex:'#15161B'},{name:'Bone',hex:'#E9E2D3'},{name:'Burgundy',hex:'#7C2333'}], sizes:['XS','S','M','L','XL'], soldOut:false, desc:'Hand-finished wool-blend overcoat with a structured drape.', size:'wide tall' },
     { id:'p2', name:'Silk Column Dress', sku:'SD-022', price:215, img:'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=700&h=900&fit=crop', colors:[{name:'Bone',hex:'#E9E2D3'},{name:'Ink Black',hex:'#15161B'}], sizes:['XS','S','M','L'], soldOut:false, desc:'Bias-cut silk column dress, single back seam.', size:'tall' },
@@ -519,10 +508,10 @@
 
   async function loadProducts() {
     try {
-      const q = query(collection(db, "products"), where("storeId", "==", STORE_SLUG));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        PRODUCTS = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const res = await fetch(`${API_BASE}/products?store=${STORE_SLUG}`);
+      if (res.ok) {
+        const products = await res.json();
+        if (Array.isArray(products) && products.length) PRODUCTS = products;
       }
     } catch (e) {
       // Falls back silently to FALLBACK_PRODUCTS — keeps the demo looking complete even offline.
@@ -728,7 +717,11 @@
     const msg = document.getElementById('waitlistMsg');
     if (!email) { msg.textContent = 'Please enter your email address.'; return; }
     try {
-      await addDoc(collection(db, "waitlist"), { email, storeId: STORE_SLUG, joinedAt: serverTimestamp() });
+      await fetch(`${API_BASE}/stores/${STORE_SLUG}/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
     } catch (err) {
       // Non-blocking — still confirm to the visitor even if the write fails.
     }
