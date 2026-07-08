@@ -5,6 +5,7 @@
 /headless-shopify       /headless-shopify.html        200
 /portfolio              /portfolio.html                200
 /store-admin            /store-admin.html              200
+/admin                  /store-admin.html              200
 /checkout               /checkout.html                  200
 
 # SEO page and Blog posts
