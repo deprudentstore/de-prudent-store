@@ -28,5 +28,11 @@
 # Features page
 /features                            /features.html                          200
 
+# Additional pages
+/mall1                               /mall1.html                             200
+/diagnose                            /diagnose.html                          200
+/blog-post                           /blog-post.html                         200
+/site-admin                          /site-admin.html                        200
+
 # SPA catch-all — MUST BE LAST
 /*                                  /index.html                             200
