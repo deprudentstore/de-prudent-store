@@ -309,7 +309,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 Khalee Mall. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
+      <p>© <span class="copy-year">2026</span> Khalee Mall. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
     </div>
   </footer>
 
@@ -574,5 +574,7 @@
     fetchProducts();
     renderCart();
   </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

@@ -831,7 +831,7 @@
         <li>Complete the <strong>Shopify Academy</strong> free courses for certificates.</li>
       </ul>
       <a href="https://wa.me/2349162306809?text=I%20want%20to%20hire%20you%20to%20build%20my%20Shopify%20store" class="btn-gold" target="_blank">💬 Hire Me to Build a Shopify Store</a>
-      <p style="margin-top:20px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:20px;">© 2026 De Prudent Store Designer – Use code PRUDENT10 for $10 OFF your first store order on Zinn Hub!</p>
+      <p style="margin-top:20px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:20px;">© <span class="copy-year">2026</span> De Prudent Store Designer – Use code PRUDENT10 for $10 OFF your first store order on Zinn Hub!</p>
     </div>
   </section>
 </section>
@@ -911,7 +911,7 @@
     </div>
     <hr class="gold-line" style="margin-bottom:24px">
     <div class="footer-bottom">
-      <p>© 2026 De Prudent Store Designer. All rights reserved.</p>
+      <p>© <span class="copy-year">2026</span> De Prudent Store Designer. All rights reserved.</p>
       <p>Serving businesses worldwide 🌍</p>
     </div>
   </div>
@@ -1267,5 +1267,7 @@
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendFreeText(); });
   })();
 </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

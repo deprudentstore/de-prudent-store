@@ -46,7 +46,7 @@
 <div id="checkoutModal" class="checkout-modal"><div class="checkout-content"><h2>Complete Your Order</h2><div id="checkoutSummary"></div><input type="text" id="custName" placeholder="Full Name *"><input type="tel" id="custPhone" placeholder="Phone *"><textarea id="custAddress" placeholder="Delivery Address *"></textarea><input type="email" id="custEmail" placeholder="Email"><button id="confirmOrderBtn" style="background:#25D366;color:white;padding:12px;border:none;border-radius:30px;width:100%;">Send via WhatsApp</button><button id="closeCheckoutBtn" style="margin-top:10px;width:100%;padding:10px;background:#eee;border:none;border-radius:30px;">Cancel</button></div></div>
 <div class="cart-overlay" id="cartOverlay"></div>
 <div class="cart-drawer" id="cartDrawer"><button class="close-cart" id="closeCartBtn">&times;</button><h2>Your Cart</h2><div id="cartItems"></div><div class="cart-footer"><p>Total: <strong id="cartTotal">€0.00</strong></p><button id="proceedCheckout" style="width:100%;background:#d4af37;padding:12px;border:none;border-radius:30px;font-weight:bold;">Proceed to Checkout</button></div></div>
-<footer class="footer"><p>© 2026 My Store. All rights reserved.</p></footer>
+<footer class="footer"><p>© <span class="copy-year">2026</span> My Store. All rights reserved.</p></footer>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
@@ -85,5 +85,7 @@ fetchProducts(); loadCart();
 const flashEnd = new Date(); flashEnd.setUTCHours(24,0,0,0);
 setInterval(()=>{ let diff=flashEnd-new Date(); if(diff<=0) document.getElementById('flashCountdown').innerText='Sale ended'; else { let h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000); document.getElementById('flashCountdown').innerText=`Ends in ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; } },1000);
 </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

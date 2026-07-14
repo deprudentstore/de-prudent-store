@@ -197,7 +197,7 @@
       <a href="mailto:deprudentstoredesigner@gmail.com">📧 Email</a>
     </div>
   </div>
-  <p class="footer-bottom">© 2026 Abeni. A De Prudent Store Designer demo storefront. WhatsApp: +234 916 230 6809</p>
+  <p class="footer-bottom">© <span class="copy-year">2026</span> Abeni. A De Prudent Store Designer demo storefront. WhatsApp: +234 916 230 6809</p>
 </footer>
 
 <div id="checkoutModal" class="checkout-modal">
@@ -411,5 +411,7 @@ document.getElementById('confirmOrderBtn').onclick = async () => {
 fetchProducts();
 loadCart();
 </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

@@ -132,7 +132,7 @@
     </div>
   </div>
   <footer>
-    <p>© 2026 De Prudent Store Designer – Use code PRUDENT10 for $10 OFF your first store order!</p>
+    <p>© <span class="copy-year">2026</span> De Prudent Store Designer – Use code PRUDENT10 for $10 OFF your first store order!</p>
   </footer>
   <script type="application/ld+json">
   {
@@ -182,5 +182,7 @@
     ]
   }
   </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

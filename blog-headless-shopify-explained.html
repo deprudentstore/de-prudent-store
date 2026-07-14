@@ -101,7 +101,9 @@ footer{border-top:1px solid var(--border);padding:32px 24px;text-align:center;fo
   </div>
 </main>
 <footer>
-  <p>© 2026 De Prudent Store Designer. Serving businesses worldwide 🌍</p>
+  <p>© <span class="copy-year">2026</span> De Prudent Store Designer. Serving businesses worldwide 🌍</p>
 </footer>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

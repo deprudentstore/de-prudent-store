@@ -468,7 +468,7 @@ function App() {
             <a href="mailto:deprudentstoredesigner@gmail.com">📧 Email</a>
           </div>
         </div>
-        <p className="footer-bottom">© 2026 Kern. A De Prudent Store Designer demo storefront.</p>
+        <p className="footer-bottom">© <span class="copy-year">2026</span> Kern. A De Prudent Store Designer demo storefront.</p>
       </footer>
 
       <CartDrawer open={cartOpen} cart={cart} onClose={() => setCartOpen(false)} onQty={updateQty} onCheckout={checkout} />
@@ -478,5 +478,7 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

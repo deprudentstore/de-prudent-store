@@ -152,8 +152,10 @@
 </section>
 
 <footer>
-  <p>&copy; 2026 De Prudent Store Designer. All rights reserved.</p>
+  <p>&copy; <span class="copy-year">2026</span> De Prudent Store Designer. All rights reserved.</p>
 </footer>
 
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>

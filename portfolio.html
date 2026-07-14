@@ -162,7 +162,7 @@
     </div>
 
     <div class="footer">
-      <p>© 2026 De Prudent Store Designer. All rights reserved.</p>
+      <p>© <span class="copy-year">2026</span> De Prudent Store Designer. All rights reserved.</p>
       <p><a href="https://wa.me/2349162306809">WhatsApp: +234 916 230 6809</a> | Serving businesses globally</p>
     </div>
   </div>
@@ -185,5 +185,7 @@
       });
     });
   </script>
+
+<script id="copyYearScript">document.querySelectorAll(".copy-year").forEach(function(el){el.textContent=new Date().getFullYear();});</script>
 </body>
 </html>
