@@ -40,6 +40,14 @@
       <div class="total">Total: <span id="orderTotal"></span></div>
     </div>
 
+    <div class="section" id="customerSection">
+      <h2>Your Details</h2>
+      <input type="text" id="customerName" placeholder="Full name" style="width:100%;padding:10px;margin-top:8px;border:1px solid #ddd;border-radius:8px;">
+      <input type="tel" id="customerPhone" placeholder="Phone number" style="width:100%;padding:10px;margin-top:8px;border:1px solid #ddd;border-radius:8px;">
+      <input type="text" id="customerAddress" placeholder="Delivery address (optional)" style="width:100%;padding:10px;margin-top:8px;border:1px solid #ddd;border-radius:8px;">
+      <p id="customerError" style="color:#c0392b;margin-top:6px;font-size:0.85rem;"></p>
+    </div>
+
     <div class="section hidden" id="bankSection">
       <h2>Bank Transfer</h2>
       <p>Transfer the total amount to the account below and send us a confirmation on WhatsApp.</p>
@@ -92,9 +100,47 @@
       `;
     }
 
+    function getCustomerDetails() {
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const errEl = document.getElementById('customerError');
+      if (!name || !phone) {
+        errEl.textContent = 'Please enter your name and phone number before confirming.';
+        return null;
+      }
+      errEl.textContent = '';
+      return { name, phone, address };
+    }
+
+    // Saves the order to the backend so it shows up in the store's admin
+    // dashboard. Runs before WhatsApp/Paystack confirmation. If the API is
+    // unreachable, the order still goes through via WhatsApp/Paystack —
+    // this only fails silently in the background so a backend hiccup never
+    // blocks a real customer from completing their order.
+    async function saveOrder(customer, paymentRef) {
+      if (cart.length === 0) return null;
+      const items = cart.map(i => ({ name: i.name, price: i.price, qty: i.qty, productId: i.id || i._id || undefined }));
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      try {
+        const res = await fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storeSlug, customer, items, total, paymentRef })
+        });
+        if (!res.ok) throw new Error('Order save failed');
+        return await res.json();
+      } catch (e) {
+        console.error('Could not save order to backend:', e);
+        return null;
+      }
+    }
+
     if (storeData.paystackPublicKey) {
       document.getElementById('paystackBtn').classList.remove('hidden');
       document.getElementById('paystackBtn').addEventListener('click', () => {
+        const customer = getCustomerDetails();
+        if (!customer) return;
         const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
         const handler = PaystackPop.setup({
           key: storeData.paystackPublicKey,
@@ -105,8 +151,9 @@
           onClose: function() {
             document.getElementById('payment-status').textContent = 'Payment cancelled.';
           },
-          callback: function(response) {
+          callback: async function(response) {
             document.getElementById('payment-status').innerHTML = '<span style="color:green;">✅ Payment successful! Reference: ' + response.reference + '</span>';
+            await saveOrder(customer, response.reference);
             localStorage.removeItem('checkoutCart');
           }
         });
@@ -114,8 +161,13 @@
       });
     }
 
-    document.getElementById('whatsappConfirmBtn').addEventListener('click', () => {
+    document.getElementById('whatsappConfirmBtn').addEventListener('click', async () => {
       if (cart.length === 0) return;
+      const customer = getCustomerDetails();
+      if (!customer) return;
+      document.getElementById('whatsappConfirmBtn').textContent = 'Saving order...';
+      await saveOrder(customer);
+      localStorage.removeItem('checkoutCart');
       const summary = cart.map(i => `${i.name} x${i.qty} - €${(i.price * i.qty).toFixed(2)}`).join('%0A');
       const total = cart.reduce((s,i) => s + i.price * i.qty, 0).toFixed(2);
       const waNumber = storeData.whatsappNumber || '2349162306809';
