@@ -445,8 +445,8 @@
       </div>
       <div style="flex:2;">
         <p class="section-label">About the Founder</p>
-        <h2 class="display" style="font-size:2rem;font-weight:700;margin-bottom:12px;">Rasheed Ayomide</h2>
-        <p style="color:var(--muted);line-height:1.8;max-width:600px;">
+        <h2 class="display" style="font-size:2rem;font-weight:700;margin-bottom:12px;" id="founderName">Rasheed Ayomide</h2>
+        <p style="color:var(--muted);line-height:1.8;max-width:600px;" id="founderBio">
           <strong>Doctor of Physiotherapy (DPT) candidate</strong> by day, <strong>professional e‑commerce architect</strong> by trade. 
           My focus is on crafting <strong>seamless user experiences (UX)</strong> and <strong>high-converting customer journeys</strong> — every store is hand-coded so you never touch a line of code yourself. 
           I deliver <strong>mobile-responsive, performance-optimized</strong> websites that score 90+ on Lighthouse.
@@ -478,8 +478,8 @@
   <!-- How It Works -->
   <section class="section" id="how-it-works">
     <div class="section-inner">
-      <div class="section-head"><p class="section-label">The Process</p><h2 class="section-title display">From Idea to Live Store</h2><p class="section-sub" style="margin:12px auto 0">Four simple steps. Most stores are live within 48 hours.</p></div>
-      <div class="grid-4">
+      <div class="section-head"><p class="section-label">The Process</p><h2 class="section-title display" id="howItWorksTitle">From Idea to Live Store</h2><p class="section-sub" style="margin:12px auto 0" id="howItWorksSubtitle">Four simple steps. Most stores are live within 48 hours.</p></div>
+      <div class="grid-4" id="howItWorksGrid">
         <div class="card step-card"><div class="step-icon">💬</div><div class="step-num">01</div><h3 class="step-title">Tell Us Your Vision</h3><p class="step-desc">Chat with us on WhatsApp about your products, brand colours, and style. Usually 15–20 minutes.</p><div class="step-corner"></div></div>
         <div class="card step-card"><div class="step-icon">🎨</div><div class="step-num">02</div><h3 class="step-title">We Design a Preview</h3><p class="step-desc">Within 24 hours you receive a live demo link to review and request changes at no extra cost.</p><div class="step-corner"></div></div>
         <div class="card step-card"><div class="step-icon">✅</div><div class="step-num">03</div><h3 class="step-title">Approve & Pay</h3><p class="step-desc">Once you love it, we finalise the store. One-time payment — no hidden fees, ever.</p><div class="step-corner"></div></div>
@@ -491,8 +491,8 @@
   <!-- What We Build -->
   <section class="section" id="what-we-build">
     <div class="section-inner">
-      <div class="section-head"><p class="section-label">What We Build</p><h2 class="section-title display">A Store for Every Business</h2></div>
-      <div class="grid-3">
+      <div class="section-head"><p class="section-label">What We Build</p><h2 class="section-title display" id="whatWeBuildTitle">A Store for Every Business</h2></div>
+      <div class="grid-3" id="whatWeBuildGrid">
         <div class="type-item"><span class="type-icon">🍽️</span><div><p class="type-title">Restaurant & Food</p><p class="type-desc">Menu display, online ordering, WhatsApp delivery, table booking.</p></div></div>
         <div class="type-item"><span class="type-icon">👗</span><div><p class="type-title">Fashion & Boutique</p><p class="type-desc">Product gallery, size filters, cart system, lookbook layouts.</p></div></div>
         <div class="type-item"><span class="type-icon">💄</span><div><p class="type-title">Beauty & Salon</p><p class="type-desc">Service listings, booking links, before/after galleries, pricing tables.</p></div></div>
@@ -507,20 +507,20 @@
   <section class="section" id="growth-plan" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface2);">
     <div class="section-inner" style="text-align:center;max-width:800px;">
       <p class="section-label">Scalable Growth</p>
-      <h2 class="section-title display">The 90-Day Growth Plan</h2>
-      <p class="section-sub" style="margin:12px auto 0;max-width:none;">
+      <h2 class="section-title display" id="growthPlanTitle">The 90-Day Growth Plan</h2>
+      <p class="section-sub" style="margin:12px auto 0;max-width:none;" id="growthPlanText">
         <strong>Month 1:</strong> Build your store & get initial traffic.<br>
         <strong>Month 2:</strong> Add SEO, backlinks & product research.<br>
         <strong>Month 3:</strong> Launch Facebook/TikTok ads & social media management.
       </p>
-      <a href="#" onclick="showPage('pricing');return false;" class="btn-gold" style="margin-top:30px;">See Full Growth Packages →</a>
+      <a href="#" onclick="showPage('pricing');return false;" class="btn-gold" style="margin-top:30px;" id="growthPlanBtn">See Full Growth Packages →</a>
     </div>
   </section>
 
   <!-- Newsletter signup — homepage -->
   <section class="section" id="home-newsletter" style="text-align:center;">
     <div class="section-inner" style="max-width:600px;">
-      <p style="font-size:14px;color:var(--muted);margin-bottom:12px;">📬 Get free store‑building tips & early access</p>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:12px;" class="newsletterBlurb">📬 Get free store‑building tips & early access</p>
       <form class="newsletter-form" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <label style="position:absolute;left:-9999px;">Email address</label>
         <input type="email" class="newsletter-email" placeholder="Your email address" required style="padding:12px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Outfit',sans-serif;min-width:240px;outline:none;" />
@@ -536,9 +536,9 @@
   <section class="section" id="demos">
     <div class="section-inner">
       <div class="section-head">
-        <p class="section-label">Live Demos</p>
-        <h2 class="section-title display">See Your Store in Action</h2>
-        <p class="section-sub" style="margin:12px auto 0;max-width:600px;">These aren’t templates – <strong style="color:var(--text);">I coded each one from scratch</strong>. From Mall to Restaurant to Luxury, every demo is a fully functional, professional web application built to sell.</p>
+        <p class="section-label" id="demosLabel">Live Demos</p>
+        <h2 class="section-title display" id="demosTitle">See Your Store in Action</h2>
+        <p class="section-sub" style="margin:12px auto 0;max-width:600px;" id="demosSubtitle">These aren’t templates – <strong style="color:var(--text);">I coded each one from scratch</strong>. From Mall to Restaurant to Luxury, every demo is a fully functional, professional web application built to sell.</p>
       </div>
       <div class="demo-tabs">
         <button class="demo-tab active" onclick="switchDemo('mall',this)">🛒 Mall Store</button>
@@ -575,9 +575,9 @@
   <section class="section" id="solutions">
     <div class="section-inner">
       <div class="section-head">
-        <p class="section-label">Advanced Solutions</p>
-        <h2 class="section-title display">Choose the Right Store for Your Business</h2>
-        <p class="section-sub" style="margin:12px auto 0">From custom stores on <strong>Firebase, Supabase, Appwrite, Directus, Backendless</strong> to enterprise‑grade headless Shopify – I build them all. Every solution is <strong style="color:var(--text);">mobile-responsive, SEO-optimized, and built to maximize conversions.</strong></p>
+        <p class="section-label" id="solutionsLabel">Advanced Solutions</p>
+        <h2 class="section-title display" id="solutionsTitle">Choose the Right Store for Your Business</h2>
+        <p class="section-sub" style="margin:12px auto 0" id="solutionsSubtitle">From custom stores on <strong>Firebase, Supabase, Appwrite, Directus, Backendless</strong> to enterprise‑grade headless Shopify – I build them all. Every solution is <strong style="color:var(--text);">mobile-responsive, SEO-optimized, and built to maximize conversions.</strong></p>
       </div>
       <div class="solutions-grid" id="solutionsGrid">
         <div class="solution-card"><div class="solution-icon">⚡🔥</div><h3>Custom Store (Your Choice of Backend)</h3><p>Fully dynamic, <strong>high-performance</strong> online store powered by <strong>Firebase, Supabase, Appwrite, Directus, or Backendless</strong>. <strong>Mobile-responsive, SEO-friendly, and built to maximize conversions.</strong></p><ul class="solution-features"><li>Real-time product search & filters</li><li>Persistent cart (saves on refresh)</li><li>WhatsApp + Paystack / Stripe ready</li><li>Full admin dashboard included</li></ul><a href="mall.html" class="solution-link" target="_blank">Try Demo →</a></div>
@@ -855,14 +855,14 @@
 
   <section class="section" id="cta">
     <div class="cta-inner">
-      <h2 class="cta-h2">Ready to Launch a <br><span class="gold-text">High-Converting Store?</span></h2>
-      <p class="cta-sub">Message us on WhatsApp. Tell us your business type and what you sell. We'll build you a <strong style="color:var(--text);">mobile-responsive, sales-driven</strong> store and send you a live demo within 24 hours — no commitment required.</p>
+      <h2 class="cta-h2" id="ctaHeading">Ready to Launch a <br><span class="gold-text">High-Converting Store?</span></h2>
+      <p class="cta-sub" id="ctaSubtitle">Message us on WhatsApp. Tell us your business type and what you sell. We'll build you a <strong style="color:var(--text);">mobile-responsive, sales-driven</strong> store and send you a live demo within 24 hours — no commitment required.</p>
       <div class="cta-btns">
         <a href="https://wa.me/2349162306809?text=Hi%20De%20Prudent%2C%20I%20want%20a%20custom%20online%20store" target="_blank" class="btn-gold">💬 Chat on WhatsApp</a>
         <a href="mailto:deprudentstoredesigner@gmail.com" class="btn-outline">✉️ Send an Email</a>
       </div>
       <div style="margin:30px 0 20px;">
-        <p style="font-size:14px;color:var(--muted);margin-bottom:12px;">📬 Get free store‑building tips & early access</p>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:12px;" class="newsletterBlurb">📬 Get free store‑building tips & early access</p>
         <form class="newsletter-form" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
           <label style="position:absolute;left:-9999px;">Email address</label>
           <input type="email" class="newsletter-email" placeholder="Your email address" required style="padding:12px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Outfit',sans-serif;min-width:240px;outline:none;" />
@@ -870,7 +870,7 @@
         </form>
         <p class="newsletter-msg" style="font-size:13px;margin-top:10px;" role="status" aria-live="polite"></p>
       </div>
-      <p class="cta-note">Typically replies within 1 hour · Available Mon–Sat · All time zones welcome</p>
+      <p class="cta-note" id="ctaNote">Typically replies within 1 hour · Available Mon–Sat · All time zones welcome</p>
     </div>
   </section>
 </section>
@@ -883,7 +883,7 @@
     <div class="footer-top">
       <div>
         <div class="display" style="font-size:22px;font-weight:700">De<span class="gold-text">Prudent</span> <span style="font-weight:300;font-size:14px;color:var(--muted)">Store Designer</span></div>
-        <p class="footer-brand-desc">Building professional online stores for businesses worldwide. Fast, affordable, and built to sell.</p>
+        <p class="footer-brand-desc" id="footerBrandDesc">Building professional online stores for businesses worldwide. Fast, affordable, and built to sell.</p>
       </div>
       <div style="display:flex;gap:48px;flex-wrap:wrap">
         <div class="footer-col">
@@ -911,7 +911,7 @@
     </div>
     <hr class="gold-line" style="margin-bottom:24px">
     <div class="footer-bottom">
-      <p>© <span class="copy-year">2026</span> De Prudent Store Designer. All rights reserved.</p>
+      <p id="footerCopyright">© <span class="copy-year">2026</span> De Prudent Store Designer. All rights reserved.</p>
       <p>Serving businesses worldwide 🌍</p>
     </div>
   </div>
@@ -1011,6 +1011,72 @@
         document.querySelectorAll('a[href*="wa.me/2349162306809"]').forEach(a => {
           a.href = a.href.replace('2349162306809', content.contact.whatsappNumber);
         });
+      }
+
+      if (content.testimonialDisclaimer) {
+        document.getElementById('testimonialDisclaimer').textContent = content.testimonialDisclaimer;
+      }
+
+      if (content.founder && content.founder.name) {
+        document.getElementById('founderName').textContent = content.founder.name;
+      }
+      if (content.founder && content.founder.bio) {
+        document.getElementById('founderBio').innerHTML = escapeHtml(content.founder.bio).replace(/\n/g, '<br>');
+      }
+
+      if (content.howItWorks) {
+        if (content.howItWorks.title) document.getElementById('howItWorksTitle').textContent = content.howItWorks.title;
+        if (content.howItWorks.subtitle) document.getElementById('howItWorksSubtitle').textContent = content.howItWorks.subtitle;
+        if (Array.isArray(content.howItWorks.steps) && content.howItWorks.steps.length) {
+          const grid = document.getElementById('howItWorksGrid');
+          grid.innerHTML = content.howItWorks.steps.map((s, i) => `
+            <div class="card step-card"><div class="step-icon">${escapeHtml(s.icon)}</div><div class="step-num">${String(i+1).padStart(2,'0')}</div><h3 class="step-title">${escapeHtml(s.title)}</h3><p class="step-desc">${escapeHtml(s.desc)}</p><div class="step-corner"></div></div>`).join('');
+        }
+      }
+
+      if (content.whatWeBuild) {
+        if (content.whatWeBuild.title) document.getElementById('whatWeBuildTitle').textContent = content.whatWeBuild.title;
+        if (Array.isArray(content.whatWeBuild.items) && content.whatWeBuild.items.length) {
+          const grid = document.getElementById('whatWeBuildGrid');
+          grid.innerHTML = content.whatWeBuild.items.map(it => `
+            <div class="type-item"><span class="type-icon">${escapeHtml(it.icon)}</span><div><p class="type-title">${escapeHtml(it.title)}</p><p class="type-desc">${escapeHtml(it.desc)}</p></div></div>`).join('');
+        }
+      }
+
+      if (content.growthPlan) {
+        if (content.growthPlan.title) document.getElementById('growthPlanTitle').textContent = content.growthPlan.title;
+        if (content.growthPlan.text) document.getElementById('growthPlanText').innerHTML = escapeHtml(content.growthPlan.text).replace(/\n/g, '<br>');
+        if (content.growthPlan.buttonText) document.getElementById('growthPlanBtn').textContent = content.growthPlan.buttonText;
+      }
+
+      if (content.newsletterText) {
+        document.querySelectorAll('.newsletterBlurb').forEach(el => { el.textContent = content.newsletterText; });
+      }
+
+      if (content.cta) {
+        if (content.cta.heading) document.getElementById('ctaHeading').textContent = content.cta.heading;
+        if (content.cta.subtitle) document.getElementById('ctaSubtitle').textContent = content.cta.subtitle;
+        if (content.cta.note) document.getElementById('ctaNote').textContent = content.cta.note;
+      }
+
+      if (content.footer) {
+        if (content.footer.brandDesc) document.getElementById('footerBrandDesc').textContent = content.footer.brandDesc;
+        if (content.footer.copyrightText) {
+          document.getElementById('footerCopyright').innerHTML =
+            `© <span class="copy-year">${new Date().getFullYear()}</span> ${escapeHtml(content.footer.copyrightText)}`;
+        }
+      }
+
+      if (content.demosIntro) {
+        if (content.demosIntro.label) document.getElementById('demosLabel').textContent = content.demosIntro.label;
+        if (content.demosIntro.title) document.getElementById('demosTitle').textContent = content.demosIntro.title;
+        if (content.demosIntro.subtitle) document.getElementById('demosSubtitle').textContent = content.demosIntro.subtitle;
+      }
+
+      if (content.solutionsIntro) {
+        if (content.solutionsIntro.label) document.getElementById('solutionsLabel').textContent = content.solutionsIntro.label;
+        if (content.solutionsIntro.title) document.getElementById('solutionsTitle').textContent = content.solutionsIntro.title;
+        if (content.solutionsIntro.subtitle) document.getElementById('solutionsSubtitle').textContent = content.solutionsIntro.subtitle;
       }
     } catch (e) {
       // Network hiccup or backend down — the hardcoded content already on

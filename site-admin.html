@@ -103,7 +103,36 @@ function PageContentEditor() {
 
   useEffect(() => {
     apiFetch('/admin/content/index').then(data => {
-      setContent(data || { hero:{title:'',subtitle:''}, contact:{whatsappNumber:'',email:''}, pricing:[], services:[], testimonials:[] });
+      const blank = {
+        hero:{title:'',subtitle:''}, contact:{whatsappNumber:'',email:''},
+        pricing:[], services:[], testimonials:[], testimonialDisclaimer:'',
+        founder:{name:'',bio:''},
+        howItWorks:{title:'',subtitle:'',steps:[]},
+        whatWeBuild:{title:'',items:[]},
+        growthPlan:{title:'',text:'',buttonText:''},
+        newsletterText:'',
+        cta:{heading:'',subtitle:'',note:''},
+        footer:{brandDesc:'',copyrightText:''},
+        demosIntro:{label:'',title:'',subtitle:''},
+        solutionsIntro:{label:'',title:'',subtitle:''},
+      };
+      // Merge fetched data over the blank shape so older saved docs (missing
+      // the new fields) don't crash the inputs below with undefined values.
+      const merged = data ? {
+        ...blank, ...data,
+        hero: {...blank.hero, ...(data.hero||{})},
+        contact: {...blank.contact, ...(data.contact||{})},
+        founder: {...blank.founder, ...(data.founder||{})},
+        howItWorks: {...blank.howItWorks, ...(data.howItWorks||{}), steps: (data.howItWorks && data.howItWorks.steps) || []},
+        whatWeBuild: {...blank.whatWeBuild, ...(data.whatWeBuild||{}), items: (data.whatWeBuild && data.whatWeBuild.items) || []},
+        growthPlan: {...blank.growthPlan, ...(data.growthPlan||{})},
+        cta: {...blank.cta, ...(data.cta||{})},
+        footer: {...blank.footer, ...(data.footer||{})},
+        demosIntro: {...blank.demosIntro, ...(data.demosIntro||{})},
+        solutionsIntro: {...blank.solutionsIntro, ...(data.solutionsIntro||{})},
+        pricing: data.pricing || [], services: data.services || [], testimonials: data.testimonials || [],
+      } : blank;
+      setContent(merged);
     }).catch(err => setStatus(err.message));
   }, []);
 
@@ -129,6 +158,18 @@ function PageContentEditor() {
   const addRow = (arrName, blank) => setContent(prev => ({ ...prev, [arrName]: [...prev[arrName], blank] }));
   const removeRow = (arrName, idx) => setContent(prev => ({ ...prev, [arrName]: prev[arrName].filter((_,i)=>i!==idx) }));
 
+  // Same as updateRow/addRow/removeRow but for arrays nested one level down,
+  // e.g. content.howItWorks.steps or content.whatWeBuild.items.
+  const updateNestedRow = (parent, arrName, idx, key, value) => {
+    setContent(prev => { const next=JSON.parse(JSON.stringify(prev)); next[parent][arrName][idx][key]=value; return next; });
+  };
+  const addNestedRow = (parent, arrName, blank) => {
+    setContent(prev => { const next=JSON.parse(JSON.stringify(prev)); next[parent][arrName].push(blank); return next; });
+  };
+  const removeNestedRow = (parent, arrName, idx) => {
+    setContent(prev => { const next=JSON.parse(JSON.stringify(prev)); next[parent][arrName].splice(idx,1); return next; });
+  };
+
   const save = async () => {
     setSaving(true); setStatus('');
     try {
@@ -144,6 +185,12 @@ function PageContentEditor() {
         <h2 className="font-display text-xl font-bold mb-4">Hero</h2>
         <Field label="Headline"><input className={inputCls} value={content.hero.title} onChange={e=>update('hero.title', e.target.value)} /></Field>
         <Field label="Subtitle"><textarea rows="3" className={inputCls} value={content.hero.subtitle} onChange={e=>update('hero.subtitle', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">About the Founder</h2>
+        <Field label="Name"><input className={inputCls} value={content.founder.name} onChange={e=>update('founder.name', e.target.value)} /></Field>
+        <Field label="Bio"><textarea rows="4" className={inputCls} value={content.founder.bio} onChange={e=>update('founder.bio', e.target.value)} /></Field>
       </section>
 
       <section className="bg-white rounded-2xl border border-black/5 p-6">
@@ -231,6 +278,88 @@ function PageContentEditor() {
             <textarea rows="2" className={inputCls} placeholder="Quote" value={t.quote} onChange={e=>updateRow('testimonials',i,'quote',e.target.value)} />
           </div>
         ))}
+        <Field label="Disclaimer text below testimonials"><textarea rows="2" className={inputCls} value={content.testimonialDisclaimer} onChange={e=>update('testimonialDisclaimer', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">How It Works</h2>
+        <Field label="Section title"><input className={inputCls} value={content.howItWorks.title} onChange={e=>update('howItWorks.title', e.target.value)} /></Field>
+        <Field label="Section subtitle"><input className={inputCls} value={content.howItWorks.subtitle} onChange={e=>update('howItWorks.subtitle', e.target.value)} /></Field>
+        <div className="flex justify-between items-center mb-2 mt-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-black/40">Steps</p>
+          <button onClick={()=>addNestedRow('howItWorks','steps',{icon:'',title:'',desc:''})} className="text-xs bg-black/5 rounded-full px-3 py-1.5">+ Add Step</button>
+        </div>
+        {content.howItWorks.steps.map((s,i)=>(
+          <div key={i} className="border border-black/10 rounded-xl p-4 mb-3">
+            <div className="flex gap-2 mb-2">
+              <input className={inputCls+" max-w-[70px]"} placeholder="Icon" value={s.icon} onChange={e=>updateNestedRow('howItWorks','steps',i,'icon',e.target.value)} />
+              <input className={inputCls} placeholder="Step title" value={s.title} onChange={e=>updateNestedRow('howItWorks','steps',i,'title',e.target.value)} />
+              <button onClick={()=>removeNestedRow('howItWorks','steps',i)} className="text-red-500 text-xs px-2">✕</button>
+            </div>
+            <textarea rows="2" className={inputCls} placeholder="Description" value={s.desc} onChange={e=>updateNestedRow('howItWorks','steps',i,'desc',e.target.value)} />
+          </div>
+        ))}
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">What We Build</h2>
+        <Field label="Section title"><input className={inputCls} value={content.whatWeBuild.title} onChange={e=>update('whatWeBuild.title', e.target.value)} /></Field>
+        <div className="flex justify-between items-center mb-2 mt-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-black/40">Business Types</p>
+          <button onClick={()=>addNestedRow('whatWeBuild','items',{icon:'',title:'',desc:''})} className="text-xs bg-black/5 rounded-full px-3 py-1.5">+ Add Item</button>
+        </div>
+        {content.whatWeBuild.items.map((it,i)=>(
+          <div key={i} className="border border-black/10 rounded-xl p-4 mb-3">
+            <div className="flex gap-2 mb-2">
+              <input className={inputCls+" max-w-[70px]"} placeholder="Icon" value={it.icon} onChange={e=>updateNestedRow('whatWeBuild','items',i,'icon',e.target.value)} />
+              <input className={inputCls} placeholder="Title" value={it.title} onChange={e=>updateNestedRow('whatWeBuild','items',i,'title',e.target.value)} />
+              <button onClick={()=>removeNestedRow('whatWeBuild','items',i)} className="text-red-500 text-xs px-2">✕</button>
+            </div>
+            <textarea rows="2" className={inputCls} placeholder="Description" value={it.desc} onChange={e=>updateNestedRow('whatWeBuild','items',i,'desc',e.target.value)} />
+          </div>
+        ))}
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">90-Day Growth Plan</h2>
+        <Field label="Title"><input className={inputCls} value={content.growthPlan.title} onChange={e=>update('growthPlan.title', e.target.value)} /></Field>
+        <Field label="Text (plain text, line breaks are kept)"><textarea rows="3" className={inputCls} value={content.growthPlan.text} onChange={e=>update('growthPlan.text', e.target.value)} /></Field>
+        <Field label="Button text"><input className={inputCls} value={content.growthPlan.buttonText} onChange={e=>update('growthPlan.buttonText', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Newsletter Blurb</h2>
+        <p className="text-xs text-black/40 mb-2">Used above both newsletter signup forms (homepage and contact page).</p>
+        <Field label="Blurb text"><input className={inputCls} value={content.newsletterText} onChange={e=>update('newsletterText', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Final CTA Section</h2>
+        <p className="text-xs text-black/40 mb-2">Heading is plain text — the gold-highlighted line break in the default design will be replaced with your plain text once edited.</p>
+        <Field label="Heading"><input className={inputCls} value={content.cta.heading} onChange={e=>update('cta.heading', e.target.value)} /></Field>
+        <Field label="Subtitle"><textarea rows="3" className={inputCls} value={content.cta.subtitle} onChange={e=>update('cta.subtitle', e.target.value)} /></Field>
+        <Field label="Note (below buttons)"><input className={inputCls} value={content.cta.note} onChange={e=>update('cta.note', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Footer</h2>
+        <Field label="Brand description"><textarea rows="2" className={inputCls} value={content.footer.brandDesc} onChange={e=>update('footer.brandDesc', e.target.value)} /></Field>
+        <Field label="Copyright line (year is added automatically)"><input className={inputCls} placeholder="De Prudent Store Designer. All rights reserved." value={content.footer.copyrightText} onChange={e=>update('footer.copyrightText', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Demos Page Intro</h2>
+        <Field label="Label"><input className={inputCls} value={content.demosIntro.label} onChange={e=>update('demosIntro.label', e.target.value)} /></Field>
+        <Field label="Title"><input className={inputCls} value={content.demosIntro.title} onChange={e=>update('demosIntro.title', e.target.value)} /></Field>
+        <Field label="Subtitle"><textarea rows="2" className={inputCls} value={content.demosIntro.subtitle} onChange={e=>update('demosIntro.subtitle', e.target.value)} /></Field>
+      </section>
+
+      <section className="bg-white rounded-2xl border border-black/5 p-6">
+        <h2 className="font-display text-xl font-bold mb-4">Solutions Page Intro</h2>
+        <p className="text-xs text-black/40 mb-2">The solution cards themselves are edited under "Service Cards" above.</p>
+        <Field label="Label"><input className={inputCls} value={content.solutionsIntro.label} onChange={e=>update('solutionsIntro.label', e.target.value)} /></Field>
+        <Field label="Title"><input className={inputCls} value={content.solutionsIntro.title} onChange={e=>update('solutionsIntro.title', e.target.value)} /></Field>
+        <Field label="Subtitle"><textarea rows="2" className={inputCls} value={content.solutionsIntro.subtitle} onChange={e=>update('solutionsIntro.subtitle', e.target.value)} /></Field>
       </section>
 
       <div className="sticky bottom-4 flex items-center gap-4 bg-white/90 backdrop-blur border border-black/10 rounded-2xl p-4">
