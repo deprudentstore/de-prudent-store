@@ -975,13 +975,13 @@
         const grid = document.getElementById('priceGrid');
         grid.innerHTML = content.pricing.map(block => `
           <div class="price-block">
-            <h3>${escapeHtml(block.title)}</h3>
-            <p class="sub">${escapeHtml(block.subtitle)}</p>
+            <h3>${block.title || ''}</h3>
+            <p class="sub">${block.subtitle || ''}</p>
             <table>
               <tr><th>Service</th><th>Price</th></tr>
-              ${block.rows.map(r => `<tr><td>${escapeHtml(r.service)}</td><td>${escapeHtml(r.price)}</td></tr>`).join('')}
+              ${block.rows.map(r => `<tr><td>${r.service || ''}</td><td>${r.price || ''}</td></tr>`).join('')}
             </table>
-            <a href="${escapeAttr(block.ctaUrl)}" class="price-btn" target="_blank">${escapeHtml(block.ctaText)}</a>
+            <a href="${escapeAttr(block.ctaUrl)}" class="price-btn" target="_blank">${block.ctaText || ''}</a>
           </div>`).join('');
       }
 
@@ -989,11 +989,11 @@
         const grid = document.getElementById('solutionsGrid');
         grid.innerHTML = content.services.map(s => `
           <div class="solution-card">
-            <div class="solution-icon">${escapeHtml(s.icon)}</div>
-            <h3>${escapeHtml(s.title)}</h3>
-            <p>${escapeHtml(s.description)}</p>
-            <ul class="solution-features">${(s.features||[]).map(f => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-            <a href="${escapeAttr(s.linkUrl)}" class="solution-link" target="_blank">${escapeHtml(s.linkText)}</a>
+            <div class="solution-icon">${s.icon || ''}</div>
+            <h3>${s.title || ''}</h3>
+            <p>${s.description || ''}</p>
+            <ul class="solution-features">${(s.features||[]).map(f => `<li>${f}</li>`).join('')}</ul>
+            <a href="${escapeAttr(s.linkUrl)}" class="solution-link" target="_blank">${s.linkText || ''}</a>
           </div>`).join('');
       }
 
@@ -1002,8 +1002,8 @@
         grid.innerHTML = content.testimonials.map(t => `
           <div class="card review-card">
             <div class="quote-mark">❝</div>
-            <p class="review-text">${escapeHtml(t.quote)}</p>
-            <div class="review-foot"><p class="review-name">${escapeHtml(t.name)}</p><p class="review-role">${escapeHtml(t.role)}</p></div>
+            <p class="review-text">${t.quote || ''}</p>
+            <div class="review-foot"><p class="review-name">${t.name || ''}</p><p class="review-role">${t.role || ''}</p></div>
           </div>`).join('');
       }
 
@@ -1014,76 +1014,75 @@
       }
 
       if (content.testimonialDisclaimer) {
-        document.getElementById('testimonialDisclaimer').textContent = content.testimonialDisclaimer;
+        document.getElementById('testimonialDisclaimer').innerHTML = content.testimonialDisclaimer;
       }
 
       if (content.founder && content.founder.name) {
-        document.getElementById('founderName').textContent = content.founder.name;
+        document.getElementById('founderName').innerHTML = content.founder.name;
       }
       if (content.founder && content.founder.bio) {
-        document.getElementById('founderBio').innerHTML = escapeHtml(content.founder.bio).replace(/\n/g, '<br>');
+        document.getElementById('founderBio').innerHTML = content.founder.bio.replace(/\n/g, '<br>');
       }
 
       if (content.howItWorks) {
-        if (content.howItWorks.title) document.getElementById('howItWorksTitle').textContent = content.howItWorks.title;
-        if (content.howItWorks.subtitle) document.getElementById('howItWorksSubtitle').textContent = content.howItWorks.subtitle;
+        if (content.howItWorks.title) document.getElementById('howItWorksTitle').innerHTML = content.howItWorks.title;
+        if (content.howItWorks.subtitle) document.getElementById('howItWorksSubtitle').innerHTML = content.howItWorks.subtitle;
         if (Array.isArray(content.howItWorks.steps) && content.howItWorks.steps.length) {
           const grid = document.getElementById('howItWorksGrid');
           grid.innerHTML = content.howItWorks.steps.map((s, i) => `
-            <div class="card step-card"><div class="step-icon">${escapeHtml(s.icon)}</div><div class="step-num">${String(i+1).padStart(2,'0')}</div><h3 class="step-title">${escapeHtml(s.title)}</h3><p class="step-desc">${escapeHtml(s.desc)}</p><div class="step-corner"></div></div>`).join('');
+            <div class="card step-card"><div class="step-icon">${s.icon || ''}</div><div class="step-num">${String(i+1).padStart(2,'0')}</div><h3 class="step-title">${s.title || ''}</h3><p class="step-desc">${s.desc || ''}</p><div class="step-corner"></div></div>`).join('');
         }
       }
 
       if (content.whatWeBuild) {
-        if (content.whatWeBuild.title) document.getElementById('whatWeBuildTitle').textContent = content.whatWeBuild.title;
+        if (content.whatWeBuild.title) document.getElementById('whatWeBuildTitle').innerHTML = content.whatWeBuild.title;
         if (Array.isArray(content.whatWeBuild.items) && content.whatWeBuild.items.length) {
           const grid = document.getElementById('whatWeBuildGrid');
           grid.innerHTML = content.whatWeBuild.items.map(it => `
-            <div class="type-item"><span class="type-icon">${escapeHtml(it.icon)}</span><div><p class="type-title">${escapeHtml(it.title)}</p><p class="type-desc">${escapeHtml(it.desc)}</p></div></div>`).join('');
+            <div class="type-item"><span class="type-icon">${it.icon || ''}</span><div><p class="type-title">${it.title || ''}</p><p class="type-desc">${it.desc || ''}</p></div></div>`).join('');
         }
       }
 
       if (content.growthPlan) {
-        if (content.growthPlan.title) document.getElementById('growthPlanTitle').textContent = content.growthPlan.title;
-        if (content.growthPlan.text) document.getElementById('growthPlanText').innerHTML = escapeHtml(content.growthPlan.text).replace(/\n/g, '<br>');
-        if (content.growthPlan.buttonText) document.getElementById('growthPlanBtn').textContent = content.growthPlan.buttonText;
+        if (content.growthPlan.title) document.getElementById('growthPlanTitle').innerHTML = content.growthPlan.title;
+        if (content.growthPlan.text) document.getElementById('growthPlanText').innerHTML = content.growthPlan.text.replace(/\n/g, '<br>');
+        if (content.growthPlan.buttonText) document.getElementById('growthPlanBtn').innerHTML = content.growthPlan.buttonText;
       }
 
       if (content.newsletterText) {
-        document.querySelectorAll('.newsletterBlurb').forEach(el => { el.textContent = content.newsletterText; });
+        document.querySelectorAll('.newsletterBlurb').forEach(el => { el.innerHTML = content.newsletterText; });
       }
 
       if (content.cta) {
-        if (content.cta.heading) document.getElementById('ctaHeading').textContent = content.cta.heading;
-        if (content.cta.subtitle) document.getElementById('ctaSubtitle').textContent = content.cta.subtitle;
-        if (content.cta.note) document.getElementById('ctaNote').textContent = content.cta.note;
+        if (content.cta.heading) document.getElementById('ctaHeading').innerHTML = content.cta.heading;
+        if (content.cta.subtitle) document.getElementById('ctaSubtitle').innerHTML = content.cta.subtitle;
+        if (content.cta.note) document.getElementById('ctaNote').innerHTML = content.cta.note;
       }
 
       if (content.footer) {
-        if (content.footer.brandDesc) document.getElementById('footerBrandDesc').textContent = content.footer.brandDesc;
+        if (content.footer.brandDesc) document.getElementById('footerBrandDesc').innerHTML = content.footer.brandDesc;
         if (content.footer.copyrightText) {
           document.getElementById('footerCopyright').innerHTML =
-            `© <span class="copy-year">${new Date().getFullYear()}</span> ${escapeHtml(content.footer.copyrightText)}`;
+            `© <span class="copy-year">${new Date().getFullYear()}</span> ${content.footer.copyrightText}`;
         }
       }
 
       if (content.demosIntro) {
-        if (content.demosIntro.label) document.getElementById('demosLabel').textContent = content.demosIntro.label;
-        if (content.demosIntro.title) document.getElementById('demosTitle').textContent = content.demosIntro.title;
-        if (content.demosIntro.subtitle) document.getElementById('demosSubtitle').textContent = content.demosIntro.subtitle;
+        if (content.demosIntro.label) document.getElementById('demosLabel').innerHTML = content.demosIntro.label;
+        if (content.demosIntro.title) document.getElementById('demosTitle').innerHTML = content.demosIntro.title;
+        if (content.demosIntro.subtitle) document.getElementById('demosSubtitle').innerHTML = content.demosIntro.subtitle;
       }
 
       if (content.solutionsIntro) {
-        if (content.solutionsIntro.label) document.getElementById('solutionsLabel').textContent = content.solutionsIntro.label;
-        if (content.solutionsIntro.title) document.getElementById('solutionsTitle').textContent = content.solutionsIntro.title;
-        if (content.solutionsIntro.subtitle) document.getElementById('solutionsSubtitle').textContent = content.solutionsIntro.subtitle;
+        if (content.solutionsIntro.label) document.getElementById('solutionsLabel').innerHTML = content.solutionsIntro.label;
+        if (content.solutionsIntro.title) document.getElementById('solutionsTitle').innerHTML = content.solutionsIntro.title;
+        if (content.solutionsIntro.subtitle) document.getElementById('solutionsSubtitle').innerHTML = content.solutionsIntro.subtitle;
       }
     } catch (e) {
       // Network hiccup or backend down — the hardcoded content already on
       // the page keeps showing exactly as it does today. Nothing to do.
     }
 
-    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
     function escapeAttr(s) { return (s || '').replace(/"/g, '&quot;'); }
   })();
 
