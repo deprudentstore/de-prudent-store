@@ -965,10 +965,10 @@
       if (!content) return;
 
       if (content.hero && content.hero.title) {
-        document.getElementById('heroTitle').textContent = content.hero.title;
+        document.getElementById('heroTitle').innerHTML = content.hero.title;
       }
       if (content.hero && content.hero.subtitle) {
-        document.getElementById('heroSubtitle').textContent = content.hero.subtitle;
+        document.getElementById('heroSubtitle').innerHTML = content.hero.subtitle;
       }
 
       if (Array.isArray(content.pricing) && content.pricing.length) {
