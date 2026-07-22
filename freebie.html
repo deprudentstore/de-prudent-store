@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free: The 5-Step Web Launch Checklist | De Prudent</title>
+<meta name="description" content="Free checklist: the 5 things to check before you launch a small business website.">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: Georgia, 'Times New Roman', serif;
+    background:#0d0d0d; color:#e8e8e8; min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .card {
+    max-width: 480px; width:100%; background:#151515; border:1px solid #C9973A;
+    border-radius:10px; padding:40px 28px; text-align:center;
+  }
+  h1 { color:#C9973A; font-size: 26px; line-height:1.35; margin:0 0 14px; letter-spacing:0.3px; }
+  p.sub { color:#cfcfcf; font-size: 15.5px; line-height:1.65; margin-bottom: 28px; }
+  ul.preview { text-align:left; color:#aaa; font-size:14px; line-height:1.9; margin:0 0 28px; padding-left:20px; }
+  form { display:flex; flex-direction:column; gap:12px; }
+  input[type=email] {
+    padding: 14px 16px; border-radius:5px; border:1px solid #333; background:#0d0d0d; color:#fff;
+    font-size:15px; font-family: inherit;
+  }
+  input[type=email]:focus { outline:none; border-color:#C9973A; }
+  button {
+    padding: 14px 16px; border:none; border-radius:5px; background:#C9973A; color:#0d0d0d;
+    font-weight:bold; font-size:15px; cursor:pointer; letter-spacing:0.5px; font-family: inherit;
+    transition: opacity 0.2s;
+  }
+  button:active { opacity:0.85; }
+  .msg { margin-top:14px; font-size:14px; min-height:18px; }
+  .note { color:#666; font-size:12px; margin-top:18px; }
+  .brand { color:#C9973A; font-size:13px; letter-spacing:1px; margin-bottom:22px; opacity:0.8; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">DE PRUDENT</div>
+    <h1>The 5-Step Web Launch Checklist for Small Businesses</h1>
+    <p class="sub">Most small business sites fail before launch — not from bad design, but from five things nobody checks first. Get the free checklist, delivered instantly.</p>
+    <ul class="preview">
+      <li>Speed-test before you build anything else</li>
+      <li>Mobile-first, not mobile-friendly</li>
+      <li>One clear call-to-action per page</li>
+      <li>Capture leads before you're ready to sell</li>
+      <li>Track it or you're guessing</li>
+    </ul>
+    <form id="freebieForm">
+      <input type="email" id="freebieEmail" placeholder="you@email.com" required>
+      <button type="submit">Send Me the Checklist</button>
+    </form>
+    <div class="msg" id="freebieMsg"></div>
+    <p class="note">No spam. One useful email, then occasional tips.</p>
+  </div>
+
+  <script>
+    const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
+
+    document.getElementById('freebieForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('freebieEmail');
+      const msg = document.getElementById('freebieMsg');
+      const email = emailInput.value.trim();
+      if (!email) {
+        msg.textContent = 'Please enter your email address.';
+        msg.style.color = '#f87171';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/site/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msg.textContent = "✅ Check your inbox — the checklist is on its way.";
+        msg.style.color = '#34D399';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.style.color = '#f87171';
+      }
+    });
+  </script>
+</body>
+</html>
