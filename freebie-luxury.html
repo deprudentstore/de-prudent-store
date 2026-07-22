@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free: The Boutique Owner's Guide to Selling Premium Online | Maison Lumière</title>
+<meta name="description" content="Free guide: how to sell premium, considered products online without cheapening the brand.">
+<style>
+  :root{
+    --ink:#15161B; --ink2:#1C1E25; --bone:#F1ECE1; --bone-dim:#C9C2B3;
+    --burgundy:#7C2333; --burgundy-light:#A23C4E; --brass:#A98358; --brass-light:#C7A87E;
+    --line: rgba(241,236,225,0.14);
+    --display:'Georgia','Fraunces',serif; --body:'Georgia','Times New Roman',serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: var(--body);
+    background: var(--ink); color: var(--bone); min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .card {
+    max-width: 480px; width:100%; background: var(--ink2); border:1px solid var(--line);
+    padding:44px 30px; text-align:center;
+  }
+  .brand { font-family: var(--display); color: var(--brass-light); font-size:14px; letter-spacing:3px; margin-bottom:24px; text-transform:uppercase; }
+  h1 { font-family: var(--display); color: var(--bone); font-size: 25px; line-height:1.4; margin:0 0 16px; font-weight:400; }
+  p.sub { color: var(--bone-dim); font-size: 15px; line-height:1.7; margin-bottom: 28px; }
+  ul.preview { text-align:left; color: var(--bone-dim); font-size:14px; line-height:2; margin:0 0 28px; padding-left:20px; list-style:none; }
+  ul.preview li::before { content:"— "; color: var(--brass-light); }
+  form { display:flex; flex-direction:column; gap:12px; }
+  input[type=email] {
+    padding: 14px 16px; border-radius:2px; border:1px solid var(--line); background: var(--ink); color: var(--bone);
+    font-size:15px; font-family: inherit;
+  }
+  input[type=email]:focus { outline:none; border-color: var(--brass); }
+  button {
+    padding: 14px 16px; border:none; border-radius:2px; background: var(--brass); color: var(--ink);
+    font-weight:600; font-size:13px; cursor:pointer; letter-spacing:1.5px; text-transform:uppercase; font-family: var(--body);
+  }
+  button:active { opacity:0.85; }
+  .msg { margin-top:14px; font-size:14px; min-height:18px; }
+  .msg.success { color: #A8D5BA; }
+  .msg.error { color: var(--burgundy-light); }
+  .note { color: var(--bone-dim); font-size:12px; margin-top:20px; opacity:0.7; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Maison Lumière</div>
+    <h1>The Boutique Owner's Guide to Selling Premium Online</h1>
+    <p class="sub">Selling considered, premium pieces online is not the same game as fast fashion. Get the guide before you build the next collection page.</p>
+    <ul class="preview">
+      <li>Photography that signals quality, not clutter</li>
+      <li>Pricing transparency without undercutting the brand</li>
+      <li>Waitlists that build desire instead of losing sales</li>
+      <li>Checkout that feels as considered as the product</li>
+      <li>Storytelling that justifies the price, not just the item</li>
+    </ul>
+    <form id="freebieForm">
+      <input type="email" id="freebieEmail" placeholder="Your email" required>
+      <button type="submit">Send Me the Guide</button>
+    </form>
+    <div class="msg" id="freebieMsg"></div>
+    <p class="note">No spam. One considered email, then occasional notes.</p>
+  </div>
+
+  <script>
+    const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
+    const STORE_SLUG = "luxury";
+
+    document.getElementById('freebieForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('freebieEmail');
+      const msg = document.getElementById('freebieMsg');
+      const email = emailInput.value.trim();
+      if (!email) {
+        msg.textContent = 'Please enter your email address.';
+        msg.className = 'msg error';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/${STORE_SLUG}/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msg.textContent = "✅ Check your inbox — the guide is on its way.";
+        msg.className = 'msg success';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.className = 'msg error';
+      }
+    });
+  </script>
+</body>
+</html>

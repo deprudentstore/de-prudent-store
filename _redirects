@@ -31,6 +31,10 @@
 # Additional pages
 /mall1                               /mall1.html                             200
 /freebie                             /freebie.html                           200
+/freebie-mall                        /freebie-mall.html                      200
+/freebie-luxury                      /freebie-luxury.html                    200
+/freebie-restaurant                  /freebie-restaurant.html                200
+/freebie-headless-shopify            /freebie-headless-shopify.html          200
 /diagnose                            /diagnose.html                          200
 /blog-post                           /blog-post.html                         200
 /site-admin                          /site-admin.html                        200

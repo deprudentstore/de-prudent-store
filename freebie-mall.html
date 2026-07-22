@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free: The Multi-Vendor Marketplace Launch Checklist | Khalee Mall</title>
+<meta name="description" content="Free checklist: the 5 things to nail before launching a multi-vendor online marketplace.">
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --accent: #d4af37;
+    --bg: #f5f5f5;
+    --card-bg: #fff;
+    --text: #333;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: var(--font);
+    background: var(--bg); color: var(--text); min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .card {
+    max-width: 480px; width:100%; background: var(--card-bg);
+    border-radius: 12px; padding:40px 28px; text-align:center;
+    box-shadow: 0 8px 30px rgba(26,26,46,0.12);
+  }
+  .brand { color: var(--primary); font-size:13px; letter-spacing:1px; margin-bottom:22px; font-weight:700; opacity:0.75; }
+  h1 { color: var(--primary); font-size: 24px; line-height:1.35; margin:0 0 14px; }
+  p.sub { color:#555; font-size: 15px; line-height:1.65; margin-bottom: 26px; }
+  ul.preview { text-align:left; color:#555; font-size:14px; line-height:1.9; margin:0 0 26px; padding-left:20px; }
+  form { display:flex; flex-direction:column; gap:12px; }
+  input[type=email] {
+    padding: 14px 16px; border-radius:8px; border:1px solid #ddd; background:#fafafa; color:var(--text);
+    font-size:15px; font-family: inherit;
+  }
+  input[type=email]:focus { outline:none; border-color: var(--accent); }
+  button {
+    padding: 14px 16px; border:none; border-radius:8px; background: var(--accent); color: var(--primary);
+    font-weight:bold; font-size:15px; cursor:pointer; letter-spacing:0.3px; font-family: inherit;
+  }
+  button:active { opacity:0.85; }
+  .msg { margin-top:14px; font-size:14px; min-height:18px; }
+  .msg.success { color: #1a7f45; }
+  .msg.error { color: #c0392b; }
+  .note { color:#999; font-size:12px; margin-top:18px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">KHALEE MALL</div>
+    <h1>The Multi-Vendor Marketplace Launch Checklist</h1>
+    <p class="sub">Running a marketplace with multiple sellers is a different game from a single storefront. Get the 5-step checklist before you onboard your first vendor.</p>
+    <ul class="preview">
+      <li>Vendor onboarding flow that doesn't scare sellers off</li>
+      <li>Commission & payout structure, decided upfront</li>
+      <li>Product moderation — before it's a problem</li>
+      <li>Search & category structure buyers can navigate</li>
+      <li>One dashboard, every vendor tracked</li>
+    </ul>
+    <form id="freebieForm">
+      <input type="email" id="freebieEmail" placeholder="you@email.com" required>
+      <button type="submit">Send Me the Checklist</button>
+    </form>
+    <div class="msg" id="freebieMsg"></div>
+    <p class="note">No spam. One useful email, then occasional tips.</p>
+  </div>
+
+  <script>
+    const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
+    const STORE_SLUG = "mall";
+
+    document.getElementById('freebieForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('freebieEmail');
+      const msg = document.getElementById('freebieMsg');
+      const email = emailInput.value.trim();
+      if (!email) {
+        msg.textContent = 'Please enter your email address.';
+        msg.className = 'msg error';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/${STORE_SLUG}/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msg.textContent = "✅ Check your inbox — the checklist is on its way.";
+        msg.className = 'msg success';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.className = 'msg error';
+      }
+    });
+  </script>
+</body>
+</html>

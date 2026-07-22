@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free: The WhatsApp Ordering Setup Checklist | Abeni Restaurant</title>
+<meta name="description" content="Free checklist: the 5 things every restaurant needs before taking orders on WhatsApp.">
+<style>
+  :root{
+    --brown:#2C1E16; --brown2:#3A281C; --cream:#FAF6EF; --card:#FFFFFF;
+    --gold:#D4A017; --gold-light:#E8C158; --green:#25D366; --text:#2C1E16; --muted:#8A7B6C; --line:#EDE4D6;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: var(--font);
+    background: var(--brown); color: var(--cream); min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .card {
+    max-width: 480px; width:100%; background: var(--brown2); border:1px solid rgba(232,193,88,0.2);
+    border-radius:14px; padding:40px 28px; text-align:center;
+  }
+  .brand { color: var(--gold-light); font-size:13px; letter-spacing:2px; margin-bottom:22px; text-transform:uppercase; font-weight:600; }
+  h1 { color: var(--cream); font-size: 25px; line-height:1.35; margin:0 0 14px; }
+  p.sub { color:#D9C9B6; font-size: 15px; line-height:1.65; margin-bottom: 26px; }
+  ul.preview { text-align:left; color:#D9C9B6; font-size:14px; line-height:1.9; margin:0 0 26px; padding-left:20px; }
+  form { display:flex; flex-direction:column; gap:12px; }
+  input[type=email] {
+    padding: 14px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color: var(--cream);
+    font-size:15px; font-family: inherit;
+  }
+  input[type=email]::placeholder { color: rgba(255,255,255,0.4); }
+  input[type=email]:focus { outline:none; border-color: var(--gold); }
+  button {
+    padding: 14px 16px; border:none; border-radius:20px; background: var(--gold); color: var(--brown);
+    font-weight:bold; font-size:15px; cursor:pointer; font-family: inherit;
+  }
+  button:active { opacity:0.85; }
+  .msg { margin-top:14px; font-size:14px; min-height:18px; }
+  .msg.success { color: #6FCF97; }
+  .msg.error { color: #EB5757; }
+  .note { color:#8A7B6C; font-size:12px; margin-top:18px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Abeni Restaurant</div>
+    <h1>The WhatsApp Ordering Setup Checklist</h1>
+    <p class="sub">Taking orders on WhatsApp looks simple until the messages pile up. Get the 5-step checklist to run it without losing your mind — or orders.</p>
+    <ul class="preview">
+      <li>A menu link customers can share, not a screenshot</li>
+      <li>Order confirmation customers actually see</li>
+      <li>A delivery radius you've actually decided on</li>
+      <li>Payment confirmation before the food leaves</li>
+      <li>A system for repeat customers, not just new ones</li>
+    </ul>
+    <form id="freebieForm">
+      <input type="email" id="freebieEmail" placeholder="Your email address" required>
+      <button type="submit">Send Me the Checklist</button>
+    </form>
+    <div class="msg" id="freebieMsg"></div>
+    <p class="note">No spam. One useful email, then occasional tips.</p>
+  </div>
+
+  <script>
+    const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
+    const STORE_SLUG = "restaurant";
+
+    document.getElementById('freebieForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('freebieEmail');
+      const msg = document.getElementById('freebieMsg');
+      const email = emailInput.value.trim();
+      if (!email) {
+        msg.textContent = 'Please enter your email address.';
+        msg.className = 'msg error';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/${STORE_SLUG}/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msg.textContent = "✅ Check your inbox — the checklist is on its way.";
+        msg.className = 'msg success';
+        emailInput.value = '';
+      } catch (err) {
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        msg.className = 'msg error';
+      }
+    });
+  </script>
+</body>
+</html>

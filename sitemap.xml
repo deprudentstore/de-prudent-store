@@ -29,4 +29,11 @@
   <!-- Checkout / Admin (kept out of robots.txt indexing, listed here only for completeness) -->
   <url><loc>https://deprudentportmall.netlify.app/checkout.html</loc><lastmod>2026-07-15</lastmod><changefreq>never</changefreq><priority>0.1</priority></url>
   <url><loc>https://deprudentportmall.netlify.app/store-admin.html</loc><lastmod>2026-07-15</lastmod><changefreq>never</changefreq><priority>0.1</priority></url>
+
+  <!-- Lead magnet / freebie pages -->
+  <url><loc>https://deprudentportmall.netlify.app/freebie.html</loc><lastmod>2026-07-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/freebie-mall.html</loc><lastmod>2026-07-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/freebie-luxury.html</loc><lastmod>2026-07-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/freebie-restaurant.html</loc><lastmod>2026-07-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://deprudentportmall.netlify.app/freebie-headless-shopify.html</loc><lastmod>2026-07-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>
