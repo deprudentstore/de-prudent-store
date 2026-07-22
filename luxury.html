@@ -168,6 +168,13 @@
   .footer-inner{ max-width:1280px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; gap:40px; }
   .footer-statement{ font-family:var(--display); font-size:1.3rem; max-width:320px; line-height:1.5; }
   .footer-col-title{ font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--brass-light); margin-bottom:14px; }
+  .newsletter-form{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;}
+  .newsletter-form input{flex:1;min-width:150px;padding:9px 13px;border-radius:2px;border:1px solid var(--line);background:var(--ink2);color:var(--bone);font-family:var(--body);font-size:13px;outline:none;}
+  .newsletter-form input::placeholder{color:var(--bone-dim);}
+  .newsletter-form button{background:var(--brass);color:var(--ink);border:none;padding:9px 18px;border-radius:2px;font-weight:600;cursor:pointer;font-size:12px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+  .newsletter-msg{font-size:12px;margin-top:8px;}
+  .newsletter-msg.success{color:#A8D5BA;}
+  .newsletter-msg.error{color:var(--burgundy-light);}
   .footer-col a{ display:block; font-size:13px; color:var(--bone-dim); text-decoration:none; margin-bottom:10px; }
   .footer-col a:hover{ color:var(--bone); }
   .footer-bottom{ max-width:1280px; margin:40px auto 0; padding-top:22px; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--bone-dim); }
@@ -422,6 +429,14 @@
       <a href="https://wa.me/2349162306809" target="_blank">💬 WhatsApp</a>
       <a href="mailto:deprudentstoredesigner@gmail.com">📧 Email Us</a>
     </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Stay Informed</p>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" id="newsletterEmail" placeholder="Your email" required>
+        <button type="submit">Join</button>
+      </form>
+      <p class="newsletter-msg" id="newsletterMsg"></p>
+    </div>
   </div>
   <div class="footer-bottom">
     <p>© <span class="copy-year">2026</span> MARQUE. A De Prudent Store Designer demo storefront.</p>
@@ -473,6 +488,35 @@
   // De Prudent backend API (replaces Firebase). Update after deploying to Vercel.
   const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
   const STORE_SLUG = 'luxury';
+
+  // Newsletter sign-up
+  const newsletterForm = document.getElementById('newsletterForm');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value.trim();
+      const msgEl = document.getElementById('newsletterMsg');
+      if (!email) {
+        msgEl.textContent = 'Please enter your email address.';
+        msgEl.className = 'newsletter-msg error';
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/stores/${STORE_SLUG}/newsletter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        msgEl.textContent = '✅ You\'re on the list.';
+        msgEl.className = 'newsletter-msg success';
+        document.getElementById('newsletterEmail').value = '';
+      } catch (err) {
+        msgEl.textContent = '❌ Something went wrong.';
+        msgEl.className = 'newsletter-msg error';
+      }
+    });
+  }
 
   // ===== Fallback catalogue (renders instantly; live backend data for store "luxury" overrides it if present) =====
   const FALLBACK_PRODUCTS = [

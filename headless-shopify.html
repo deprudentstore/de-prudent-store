@@ -107,6 +107,13 @@
   .footer-inner{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;}
   .footer-desc{font-size:12px;color:var(--muted);max-width:280px;margin-top:10px;line-height:1.7;}
   .footer-col-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+  .newsletter-form{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;}
+  .newsletter-input{flex:1;min-width:140px;padding:9px 13px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-family:var(--body);font-size:13px;outline:none;}
+  .newsletter-input::placeholder{color:var(--muted);}
+  .newsletter-btn{background:var(--accent);color:var(--ink);border:none;padding:9px 18px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;}
+  .newsletter-msg{font-size:12px;margin-top:8px;}
+  .newsletter-msg.success{color:#5EEAD4;}
+  .newsletter-msg.error{color:#F87171;}
   .footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:8px;}
   .footer-col a:hover{color:var(--text);}
   .footer-bottom{max-width:1280px;margin:30px auto 0;padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);text-align:center;}
@@ -260,6 +267,32 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterMsg, setNewsletterMsg] = useState({ text: '', type: '' });
+
+  const API_BASE = "https://deprudent-backend-updated.vercel.app/api";
+  const STORE_SLUG = 'headless-shopify';
+
+  async function handleNewsletterSubmit(e) {
+    e.preventDefault();
+    const email = newsletterEmail.trim();
+    if (!email) {
+      setNewsletterMsg({ text: 'Please enter your email address.', type: 'error' });
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/stores/${STORE_SLUG}/newsletter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) throw new Error('Request failed');
+      setNewsletterMsg({ text: "✅ You're subscribed!", type: 'success' });
+      setNewsletterEmail('');
+    } catch (err) {
+      setNewsletterMsg({ text: '❌ Something went wrong.', type: 'error' });
+    }
+  }
 
   useEffect(() => {
     fetchShopifyProducts().then(live => {
@@ -466,6 +499,14 @@ function App() {
             <p className="footer-col-title">Contact</p>
             <a href="https://wa.me/2349162306809" target="_blank">💬 WhatsApp</a>
             <a href="mailto:deprudentstoredesigner@gmail.com">📧 Email</a>
+          </div>
+          <div className="footer-col">
+            <p className="footer-col-title">Stay Updated</p>
+            <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+              <input type="email" className="newsletter-input" placeholder="Your email" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} required />
+              <button type="submit" className="newsletter-btn">Join</button>
+            </form>
+            {newsletterMsg.text && <p className={`newsletter-msg ${newsletterMsg.type}`}>{newsletterMsg.text}</p>}
           </div>
         </div>
         <p className="footer-bottom">© <span class="copy-year">2026</span> Kern. A De Prudent Store Designer demo storefront.</p>
